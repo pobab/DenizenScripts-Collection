@@ -8,6 +8,7 @@ Kenalan_Listener:
 
         on player toggles sneaking:
         - if !<context.state>:
+            - stop if:<player.has_flag[kenalan].not>
             - remove <player.flag[kenalan]>
             - flag <player> kenalan:!
             - stop
