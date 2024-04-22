@@ -1,5 +1,6 @@
 Kenalan_Listener:
     type: world
+    debug: false
     events:
         on player right clicks player:
         - stop if:<player.is_sneaking.not>
