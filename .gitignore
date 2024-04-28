@@ -1,0 +1,9 @@
+secrets.secret
+server_flags.dat
+
+maps.yml
+scoreboards.yml
+
+midi/
+schematics/
+player_flags/

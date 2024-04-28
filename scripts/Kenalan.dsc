@@ -4,8 +4,16 @@ Kenalan_Listener:
     events:
         on player right clicks player:
         - stop if:<player.is_sneaking.not>
+        - define target <context.entity>
         # todo: kenalain oi oiii oiiiiii
-        - narrate Nice
+        - stop if:<player.flag[temen.beneran].contains[<[target]>]>
+        - if <player.flag[teman.calon].contains[<[target]>]>:
+            - narrate "<&lt><player.name><&gt> <[target].name> kenalan yuk!"
+            - stop
+        - flag <player> teman.calon:->:<[target]>
+        - flag <[target]> teman.calon:->:<player>
+        - narrate "<&lt><player.name><&gt> <[target].name> kenalan yuk!"
+
 
         after player toggles sneaking:
         - if !<context.state>:
@@ -15,7 +23,11 @@ Kenalan_Listener:
             - stop
 
         - while <player.is_spawned> && <player.is_online>:
-            - stop if:<player.is_sneaking.not>
+            - if <player.is_sneaking.not>:
+                - stop if:<player.has_flag[kenalan].not>
+                - remove <player.flag[kenalan]>
+                - flag <player> kenalan:!
+                - stop
             - if <player.target.exists.not>:
                 - if <player.has_flag[kenalan]>:
                     - remove <player.flag[kenalan]>
@@ -23,6 +35,9 @@ Kenalan_Listener:
                 - wait 3t
                 - while next
             - define target <player.target>
+            - if <player.flag[temen.beneran].contains[<[target]>].not>:
+                - wait 3t
+                - while next
             - if <[target].is_player.not>:
                 - if <player.has_flag[kenalan]>:
                     - remove <player.flag[kenalan]>
