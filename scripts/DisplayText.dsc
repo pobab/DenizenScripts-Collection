@@ -55,10 +55,8 @@ DisplayText_Command:
         - case edit:
             - define selected   <[args].get[2]>
             - define entity     <entity[<[selected]>]>
-            - define text       <[entity].text.proc[DisplayText_Proc_SpaceSeparated]>
-            ## bug: teks menjadi 1 page ketika ambil buku editing
-            - define written    <map[pages=<[text]>]>
-            ##
+            - define text       <[entity].text.split[<&nl>]>
+            - define written    <map.with[pages].as[<[text]>]>
             - give <item[DisplayText_Editing].with[book=<[written]>;lore=<&7><[text].color[<&7>]>]>
             - flag <player> DisplayText.selected:<[entity]>
 
