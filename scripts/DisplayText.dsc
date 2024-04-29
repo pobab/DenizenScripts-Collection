@@ -3,8 +3,11 @@ DisplayText_Entity:
     debug: false
     entity_type: text_display
     # todo: bikin fiturnya terpisah dimulai dari background_color, text_shadowed
-    mechanisms:
-        background_color: TRANSPARENT
+
+DisplayText_Editing:
+    type: item
+    material: writable_book
+    display name: <&e>DisplayText Editing
 
 
 DisplayText_Command:
@@ -26,7 +29,7 @@ DisplayText_Command:
     - choose <[subcommand]>:
         # todo: select text
         ## todo: menu select menggunakan buku
-        # todo: edit selected text
+        ## todo: edit selected text
         # todo: move selected text
         - case add:
             - define location   <player.eye_location.ray_trace.forward[0.01]>
@@ -44,7 +47,7 @@ DisplayText_Command:
                 - define text       <[value].text.split[<&nl>].space_separated>
                 - define title      <[text].substring[1,17]>
                 - define hover      "<[text]><&nl><&e>Click to settings"
-                - define display    "<[loop_index]>. <[title]>..."
+                - define display    "<[loop_index]>. <[title].color[<&9>]><&9>..."
                 - define textFormat:->:<[display].on_hover[<[hover]>].on_click[/dtext edit <[value]>]>
             - define book <item[written_book].with[book_author=DisplayText;book_title=Selecting<&sp>DisplayText;book_pages=<[textFormat].separated_by[<&nl>]>]>
             - adjust <player> show_book:<[book]>
@@ -52,14 +55,24 @@ DisplayText_Command:
         - case edit:
             - define selected   <[args].get[2]>
             - define entity     <entity[<[selected]>]>
-            - define text       <[entity].text>
-            - define written    <map[pages=<[text].split[<&nl>].space_separated>]>
-            - give <item[writable_book].with[book=<[written]>]>
+            - define text       <[entity].text.split[<&nl>].space_separated>
+            - define written    <map[pages=<[text]>]>
+            - give <item[DisplayText_Editing].with[book=<[written]>;lore=<&7><[text].color[<&7>]>]>
             - flag <player> DisplayText.selected:<[entity]>
 
 
 DisplayText_Listener:
     type: world
+    debug: false
     events:
         on player edits book:
-        - narrate "Nice <context.material>"
+        - stop if:<player.item_in_hand.script.exists.not>
+        - stop if:<player.item_in_hand.script.name.equals[DisplayText_Editing].not>
+        - define entity <player.flag[displaytext.selected]>
+
+        - define book   <context.book>
+        - define pages  <[book].book_pages>
+        - foreach <[pages]>:
+            - define text:->:<[value].split[<&nl>].space_separated>
+
+        - adjust <[entity]> text:<[text].separated_by[<&nl>]>
