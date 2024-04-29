@@ -2,6 +2,7 @@ DisplayText_Entity:
     type: entity
     debug: false
     entity_type: text_display
+    # todo: bikin fiturnya terpisah dimulai dari background_color, text_shadowed
     mechanisms:
         background_color: TRANSPARENT
 
@@ -47,3 +48,18 @@ DisplayText_Command:
                 - define textFormat:->:<[display].on_hover[<[hover]>].on_click[/dtext edit <[value]>]>
             - define book <item[written_book].with[book_author=DisplayText;book_title=Selecting<&sp>DisplayText;book_pages=<[textFormat].separated_by[<&nl>]>]>
             - adjust <player> show_book:<[book]>
+
+        - case edit:
+            - define selected   <[args].get[2]>
+            - define entity     <entity[<[selected]>]>
+            - define text       <[entity].text>
+            - define written    <map[pages=<[text].split[<&nl>].space_separated>]>
+            - give <item[writable_book].with[book=<[written]>]>
+            - flag <player> DisplayText.selected:<[entity]>
+
+
+DisplayText_Listener:
+    type: world
+    events:
+        on player edits book:
+        - narrate "Nice <context.material>"
