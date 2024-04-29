@@ -9,6 +9,23 @@ DisplayText_Editing:
     material: writable_book
     display name: <&e>DisplayText Editing
 
+DisplayText_Book:
+    type: item
+    material: written_book
+    display name: DisplayText Tool
+
+DisplayText_Selected:
+    type: book
+    title: DisplayText
+    author: Pobab
+    text:
+    - <player.has_flag[DisplayText.selected].if_true[<player.flag[DisplayText.selected].text.proc[displaytext_proc_spaceseparated].substring[1,20]>...].if_false[<&4>Noting Selected]>
+      <&nl><&m>                           <&r>
+      <&nl><element[<&lb>←<&rb>].on_hover[Click to move backward].on_click[/dtext move backward 1]>
+      <element[<&lb>→<&rb>].on_hover[Click to move forward].on_click[/dtext move forward 1]>
+      <&nl><element[<&lb>Turn text shadowed<&rb>].on_click[/dtext text_shadowed]>
+      <&nl><element[<&lb>Click to edit<&rb>]>
+
 
 DisplayText_Command:
     type: command
@@ -27,7 +44,7 @@ DisplayText_Command:
 
     - define subcommand <[args].get[1]>
     - choose <[subcommand]>:
-        # todo: select text
+        ## todo: select text
         ## todo: menu select menggunakan buku
         ## todo: edit selected text
         # todo: move selected text
@@ -60,6 +77,17 @@ DisplayText_Command:
             - give <item[DisplayText_Editing].with[book=<[written]>;lore=<&7><[text].color[<&7>]>]>
             - flag <player> DisplayText.selected:<[entity]>
 
+        - case move:
+            - define direction <[args].get[2]>
+            - if <[direction]> == forward:
+                - define entity <player.flag[displaytext.selected]>
+                - define location <[entity].location>
+                - teleport <[entity]> <[location].forward[0.1]>
+            - if <[direction]> == backward:
+                - define entity <player.flag[displaytext.selected]>
+                - define location <[entity].location>
+                - teleport <[entity]> <[location].backward[0.1]>
+
 
 DisplayText_Listener:
     type: world
@@ -76,6 +104,13 @@ DisplayText_Listener:
             - define text:->:<[value].proc[displaytext_proc_spaceseparated]>
 
         - adjust <[entity]> text:<[text].separated_by[<&nl>]>
+
+        after player right clicks block with:DisplayText_Book:
+        - adjust <player> show_book:DisplayText_Selected
+        on player left clicks block with:DisplayText_Book:
+        - define entity <player.flag[displaytext.selected]>
+        - teleport <[entity]> <player.eye_location.ray_trace.forward[0.01]>
+        - determine cancelled
 
 
 DisplayText_Proc_SpaceSeparated:
