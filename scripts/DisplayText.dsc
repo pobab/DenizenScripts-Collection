@@ -44,7 +44,7 @@ DisplayText_Command:
         - case select:
             - define entitiesText   <player.eye_location.ray_trace.find_entities[DisplayText_Entity].within[3]>
             - foreach <[entitiesText]>:
-                - define text       <[value].text.split[<&nl>].space_separated>
+                - define text       <[value].text.proc[displaytext_proc_spaceseparated]>
                 - define title      <[text].substring[1,17]>
                 - define hover      "<[text]><&nl><&e>Click to settings"
                 - define display    "<[loop_index]>. <[title].color[<&9>]><&9>..."
@@ -55,8 +55,10 @@ DisplayText_Command:
         - case edit:
             - define selected   <[args].get[2]>
             - define entity     <entity[<[selected]>]>
-            - define text       <[entity].text.split[<&nl>].space_separated>
+            - define text       <[entity].text.proc[DisplayText_Proc_SpaceSeparated]>
+            ## bug: teks menjadi 1 page ketika ambil buku editing
             - define written    <map[pages=<[text]>]>
+            ##
             - give <item[DisplayText_Editing].with[book=<[written]>;lore=<&7><[text].color[<&7>]>]>
             - flag <player> DisplayText.selected:<[entity]>
 
@@ -73,6 +75,13 @@ DisplayText_Listener:
         - define book   <context.book>
         - define pages  <[book].book_pages>
         - foreach <[pages]>:
-            - define text:->:<[value].split[<&nl>].space_separated>
+            - define text:->:<[value].proc[displaytext_proc_spaceseparated]>
 
         - adjust <[entity]> text:<[text].separated_by[<&nl>]>
+
+
+DisplayText_Proc_SpaceSeparated:
+    type: procedure
+    definitions: text
+    script:
+    - determine <[text].split[<&nl>].space_separated>
