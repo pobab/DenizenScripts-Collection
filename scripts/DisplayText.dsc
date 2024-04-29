@@ -24,16 +24,26 @@ DisplayText_Command:
     - define subcommand <[args].get[1]>
     - choose <[subcommand]>:
         # todo: select text
-        # todo: menu select menggunakan buku
+        ## todo: menu select menggunakan buku
         # todo: edit selected text
         # todo: move selected text
         - case add:
-            - define location <player.eye_location.ray_trace.forward[0.01]>
-            - define text <[args].get[2].to[<[args].size>]>
+            - define location   <player.eye_location.ray_trace.forward[0.01]>
+            - define text       <[args].get[2].to[<[args].size>]>
             - spawn DisplayText_Entity[text=<[text].separated_by[<&nl>]>] <[location]>
+
         - case removeall:
             - define entityText <player.world.entities[DisplayText_Entity]>
             - remove <[entityText]>
             - narrate "<&c>all DisplayText removed"
 
-            # /ex narrate <player.eye_location.ray_trace.find_entities[DisplayText_Entity].within[1]>
+        - case select:
+            - define entitiesText   <player.eye_location.ray_trace.find_entities[DisplayText_Entity].within[3]>
+            - foreach <[entitiesText]>:
+                - define text       <[value].text.split[<&nl>].space_separated>
+                - define title      <[text].substring[1,17]>
+                - define hover      "<[text]><&nl><&e>Click to settings"
+                - define display    "<[loop_index]>. <[title]>..."
+                - define textFormat:->:<[display].on_hover[<[hover]>].on_click[/dtext edit <[value]>]>
+            - define book <item[written_book].with[book_author=DisplayText;book_title=Selecting<&sp>DisplayText;book_pages=<[textFormat].separated_by[<&nl>]>]>
+            - adjust <player> show_book:<[book]>
