@@ -11,7 +11,7 @@ DisplayText_Command:
     name: displaytext
     usage: /displaytext
     description: Display the text like hologram text do
-    permission: denizen.displaytext
+    permission: dscript.displaytext
     aliases:
     - dtext
     script:
