@@ -1,8 +1,8 @@
+# todo: feature rotation/flip
 DisplayText_Entity:
     type: entity
     debug: false
     entity_type: text_display
-    # todo: bikin fiturnya terpisah dimulai dari background_color, text_shadowed
 
 DisplayText_Editing:
     type: item
@@ -12,17 +12,19 @@ DisplayText_Editing:
 DisplayText_Book:
     type: item
     material: written_book
-    display name: DisplayText Tool
+    display name: <&6>DisplayText Tool
 
 DisplayText_Selected:
     type: book
     title: DisplayText
     author: Pobab
     text:
-    - <player.has_flag[DisplayText.selected].if_true[<player.flag[DisplayText.selected].text.proc[displaytext_proc_spaceseparated].substring[1,20]>...].if_false[<&4>Noting Selected]>
+    - <player.proc[DisplayText_getEntityDisplay].text.proc[displaytext_proc_spaceseparated].substring[1,20].on_hover[<player.proc[DisplayText_getEntityDisplay].text>].if_null[<&4>Nothing Selected]>...
       <&nl><&m>                           <&r>
-      <&nl><element[<&lb>←<&rb>].on_hover[Click to move backward].on_click[/dtext move backward 1]>
+      <&nl>Move<&co> <element[<&lb>←<&rb>].on_hover[Click to move backward].on_click[/dtext move backward 1]>
       <element[<&lb>→<&rb>].on_hover[Click to move forward].on_click[/dtext move forward 1]>
+      <&nl>Scale<&co> <element[<&lb>←→<&rb>].on_hover[Click to rescale width<&nl>Left Click to Increase<&nl>Right Click to Decrease].on_click[/dtext move backward 1]>
+      <element[<&lb>↑↓<&rb>].on_hover[Click to rescale Height<&nl>Left Click to Increase<&nl>Right Click to Decrease].on_click[/dtext move forward 1]>
       <&nl><element[<&lb>Turn text shadowed<&rb>].on_click[/dtext text_shadowed]>
       <&nl><element[<&lb>Click to edit<&rb>]>
 
@@ -44,14 +46,10 @@ DisplayText_Command:
 
     - define subcommand <[args].get[1]>
     - choose <[subcommand]>:
-        ## todo: select text
-        ## todo: menu select menggunakan buku
-        ## todo: edit selected text
-        # todo: move selected text
         - case add:
             - define location   <player.eye_location.ray_trace.forward[0.01]>
             - define text       <[args].get[2].to[<[args].size>]>
-            - spawn DisplayText_Entity[text=<[text].separated_by[<&nl>]>] <[location]>
+            - spawn DisplayText_Entity[text=<[text]>] <[location]>
 
         - case removeall:
             - define entityText <player.world.entities[DisplayText_Entity]>
@@ -59,34 +57,60 @@ DisplayText_Command:
             - narrate "<&c>all DisplayText removed"
 
         - case select:
-            - define entitiesText   <player.eye_location.ray_trace.find_entities[DisplayText_Entity].within[3]>
+            - if <[args].size> == 2:
+                - define selecting  <[args].get[2]>
+                - if !<entity[<[selecting]>].exists>:
+                    - narrate "<&4>DisplayText not found"
+                    - stop
+                - define entity     <entity[<[selecting]>]>
+                - flag <player> DisplayText.selected:<[entity]>
+                - give displaytext_book
+                - stop
+            - define entitiesText <player.eye_location.ray_trace.find_entities[DisplayText_Entity].within[2]>
+            - if <[entitiesText].is_empty>:
+                - narrate "<&4>any DisplayText not found"
+                - stop
             - foreach <[entitiesText]>:
                 - define text       <[value].text.proc[displaytext_proc_spaceseparated]>
                 - define title      <[text].substring[1,17]>
                 - define hover      "<[text]><&nl><&e>Click to settings"
                 - define display    "<[loop_index]>. <[title].color[<&9>]><&9>..."
-                - define textFormat:->:<[display].on_hover[<[hover]>].on_click[/dtext edit <[value]>]>
+                - define textFormat:->:<[display].on_hover[<[hover]>].on_click[/dtext select <[value]>]>
             - define book <item[written_book].with[book_author=DisplayText;book_title=Selecting<&sp>DisplayText;book_pages=<[textFormat].separated_by[<&nl>]>]>
             - adjust <player> show_book:<[book]>
 
         - case edit:
-            - define selected   <[args].get[2]>
-            - define entity     <entity[<[selected]>]>
+            - stop if:!<player.proc[displaytext_getentitydisplay].is_truthy>
+            - define entity     <player.proc[DisplayText_getEntityDisplay]>
             - define text       <[entity].text.split[<&nl>]>
             - define written    <map.with[pages].as[<[text]>]>
             - give <item[DisplayText_Editing].with[book=<[written]>;lore=<&7><[text].color[<&7>]>]>
-            - flag <player> DisplayText.selected:<[entity]>
 
         - case move:
+            - stop if:!<player.proc[displaytext_getentitydisplay].is_truthy>
             - define direction <[args].get[2]>
             - if <[direction]> == forward:
-                - define entity <player.flag[displaytext.selected]>
-                - define location <[entity].location>
+                - define entity     <player.proc[DisplayText_getEntityDisplay]>
+                - define location   <[entity].location>
                 - teleport <[entity]> <[location].forward[0.1]>
             - if <[direction]> == backward:
-                - define entity <player.flag[displaytext.selected]>
-                - define location <[entity].location>
+                - define entity     <player.proc[DisplayText_getEntityDisplay]>
+                - define location   <[entity].location>
                 - teleport <[entity]> <[location].backward[0.1]>
+
+        - case text_shadowed:
+            - define entity <player.proc[DisplayText_getEntityDisplay]>
+            - if <[entity].text_shadowed>:
+                - adjust <[entity]> text_shadowed:false
+            - else:
+                - adjust <[entity]> text_shadowed:true
+
+        - case background_color:
+            - define entity <player.proc[DisplayText_getEntityDisplay]>
+            - if <[entity].text_shadowed>:
+                - adjust <[entity]> background_color:<color[0,0,0,0]>
+            - else:
+                - adjust <[entity]> background_color:<color[0,0,0,64]>
 
 
 DisplayText_Listener:
@@ -94,9 +118,9 @@ DisplayText_Listener:
     debug: false
     events:
         on player edits book:
-        - stop if:<player.item_in_hand.script.exists.not>
-        - stop if:<player.item_in_hand.script.name.equals[DisplayText_Editing].not>
-        - define entity <player.flag[displaytext.selected]>
+        - stop if:!<player.item_in_hand.script.exists>
+        - stop if:!<player.item_in_hand.script.name.equals[DisplayText_Editing]>
+        - define entity <player.proc[DisplayText_getEntityDisplay]>
 
         - define book   <context.book>
         - define pages  <[book].book_pages>
@@ -108,9 +132,10 @@ DisplayText_Listener:
         after player right clicks block with:DisplayText_Book:
         - adjust <player> show_book:DisplayText_Selected
         on player left clicks block with:DisplayText_Book:
-        - define entity <player.flag[displaytext.selected]>
+        - determine passively cancelled
+        - stop if:!<player.is_sneaking>
+        - define entity <player.proc[DisplayText_getEntityDisplay]>
         - teleport <[entity]> <player.eye_location.ray_trace.forward[0.01]>
-        - determine cancelled
 
 
 DisplayText_Proc_SpaceSeparated:
@@ -118,3 +143,10 @@ DisplayText_Proc_SpaceSeparated:
     definitions: text
     script:
     - determine <[text].split[<&nl>].space_separated>
+
+DisplayText_getEntityDisplay:
+    type: procedure
+    definitions: player
+    script:
+    - determine null if:!<player.has_flag[displaytext.selected]>
+    - determine <player.flag[displaytext.selected]>
