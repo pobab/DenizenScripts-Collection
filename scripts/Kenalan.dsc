@@ -35,6 +35,9 @@ Kenalan_Listener:
                 - wait 3t
                 - while next
             - define target <player.target>
+            - if !<[target].is_player>:
+                - wait 1s
+                - while next
             - if <player.flag[temen.beneran].contains[<[target]>].not>:
                 - wait 3t
                 - while next

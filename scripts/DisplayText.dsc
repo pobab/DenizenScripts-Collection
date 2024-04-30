@@ -1,4 +1,5 @@
 # todo: feature rotation/flip
+# todo: tiap subcommand dibikin task script
 DisplayText_Entity:
     type: entity
     debug: false
@@ -28,8 +29,12 @@ DisplayText_Selected:
       <element[<&lb>→<&rb>].on_hover[Click to move forward].on_click[/dtext move forward 1]>
       <&nl>Scale<&co> <element[<&lb><&4>←].on_hover[<&e>Rescale width<&nl><&c>Click ← to Decrease].on_click[/dtext scale decrease width 1]><element[<&2>→<&r><&rb>].on_hover[<&e>Rescale width<&nl><&a>Click → to Increase].on_click[/dtext scale increase width 1]>
       <element[<&lb><&2>↑].on_hover[<&e>Rescale height<&nl><&a>Click ↑ to Increase].on_click[/dtext scale increase height 1]><element[<&4>↓<&r><&rb>].on_hover[<&e>Rescale height<&nl><&c>Click ↓ to Decrease].on_click[/dtext scale decrease height 1]>
-      <&nl><element[<&lb>Turn text shadowed<&rb>].on_hover[<&e>Click to toggle text shadowed<&nl><&7>Current<&co> <&f><player.proc[displaytext_getentity].text_shadowed>].on_click[/dtext text_shadowed]>
-      <&nl><element[<&lb>Click to edit<&rb>]>
+      <&nl><&nl>
+      <element[<&lb>Turn text shadowed<&rb>].on_hover[<&e>Click to toggle text shadowed<&nl><&7>Current<&co> <&f><player.proc[displaytext_getentity].text_shadowed>].on_click[/dtext text_shadowed]>
+      <&sp><&sp><&sp><&nbsp><&nbsp>
+      <element[<&lb>Click to edit<&rb>]>
+      <&nl><&nl><&nl><&nl><&nl><&nl>
+      <&sp><player.eye_location.ray_trace.find_entities[DisplayText_Entity].within[1].is_empty.if_true[<&r>].if_false[<&lb>Select other Text<&rb>].on_click[/dtext select]>
 
 
 DisplayText_Command:
@@ -60,27 +65,11 @@ DisplayText_Command:
             - narrate "<&c>all DisplayText removed"
 
         - case select:
-            - if <[args].get[2].exists>:
-                - define selecting  <[args].get[2]>
-                - if !<entity[<[selecting]>].exists>:
-                    - narrate "<&4>DisplayText not found"
-                    - stop
-                - define entity     <entity[<[selecting]>]>
-                - run displaytext_setentity def:<[entity]>
-                - give displaytext_book
+            - if !<[args].get[2].exists>:
+                - run DisplayText_Selecting
                 - stop
-            - define entitiesText <player.eye_location.ray_trace.find_entities[DisplayText_Entity].within[2]>
-            - if <[entitiesText].is_empty>:
-                - narrate "<&4>any DisplayText not found"
-                - stop
-            - foreach <[entitiesText]>:
-                - define text       <[value].text.proc[displaytext_proc_spaceseparated]>
-                - define title      <[text].substring[1,17]>
-                - define hover      "<[text]><&nl><&e>Click to settings"
-                - define display    "<[loop_index]>. <[title].color[<&9>]><&9>..."
-                - define textFormat:->:<[display].on_hover[<[hover]>].on_click[/dtext select <[value]>]>
-            - define book <item[written_book].with[book_author=DisplayText;book_title=Selecting<&sp>DisplayText;book_pages=<[textFormat].separated_by[<&nl>]>]>
-            - adjust <player> show_book:<[book]>
+            - define selecting <[args].get[2]>
+            - run DisplayText_Select def:<[selecting]>
 
         - case edit:
             - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
@@ -167,6 +156,36 @@ DisplayText_Rescale:
     - stop if:!<[rescale].exists>
     - stop if:<[rescale].x.equals[0].or[<[rescale].y.equals[0]>]>
     - adjust <[entity]> scale:<[rescale]>
+
+DisplayText_Selecting:
+    type: task
+    debug: false
+    script:
+    - define entitiesText <player.eye_location.ray_trace.find_entities[DisplayText_Entity].within[2]>
+    - if <[entitiesText].is_empty>:
+        - narrate "<&4>any DisplayText not found"
+        - stop
+    - foreach <[entitiesText]>:
+        - define text       <[value].text.proc[displaytext_proc_spaceseparated]>
+        - define title      <[text].substring[1,17]>
+        - define hover      "<[text]><&nl><&e>Click to settings"
+        - define display    "<[loop_index]>. <[title].color[<&9>]><&9>..."
+        - define textFormat:->:<[display].on_hover[<[hover]>].on_click[/dtext select <[value]>]>
+    - define book <item[written_book].with[book_author=DisplayText;book_title=Selecting<&sp>DisplayText;book_pages=<[textFormat].separated_by[<&nl>]>]>
+    - adjust <player> show_book:<[book]>
+
+DisplayText_Select:
+    type: task
+    debug: false
+    definitions: selecting
+    script:
+    - if !<entity[<[selecting]>].exists>:
+        - narrate "<&4>DisplayText not found"
+        - stop
+    - define entity     <entity[<[selecting]>]>
+    - run displaytext_setentity def:<[entity]>
+    - stop if:<player.inventory.contains_item[DisplayText_Book]>
+    - give displaytext_book
 
 DisplayText_Proc_SpaceSeparated:
     type: procedure
