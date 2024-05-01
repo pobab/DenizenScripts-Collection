@@ -120,8 +120,7 @@ DisplayText_Listener:
     debug: false
     events:
         on player edits book:
-        - stop if:!<player.item_in_hand.script.exists>
-        - stop if:!<player.item_in_hand.script.name.equals[DisplayText_Editing]>
+        - stop if:!<player.item_in_hand.script.name.equals[DisplayText_Editing].is_truthy>
         - define entity <player.proc[DisplayText_getEntity]>
         - define book   <context.book>
         - define pages  <[book].book_pages>
