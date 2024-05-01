@@ -91,6 +91,7 @@ DisplayText_Command:
                 - teleport <[entity]> <[location].backward[0.1]>
 
         - case scale:
+            - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
             - stop if:<[args].size.is_less_than[3]>
             - define fluctuate  <[args].get[2]>
             - define shape      <[args].get[3]>
@@ -98,6 +99,7 @@ DisplayText_Command:
             - run displaytext_rescale def:<[fluctuate]>|<[shape]>|<[value]>
 
         - case text_shadowed:
+            - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
             - define entity <player.proc[DisplayText_getEntity]>
             - if <[entity].text_shadowed>:
                 - adjust <[entity]> text_shadowed:false
@@ -105,6 +107,7 @@ DisplayText_Command:
                 - adjust <[entity]> text_shadowed:true
 
         - case background_color:
+            - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
             - define entity <player.proc[DisplayText_getEntity]>
             - if <[entity].text_shadowed>:
                 - adjust <[entity]> background_color:<color[0,0,0,0]>
@@ -120,12 +123,10 @@ DisplayText_Listener:
         - stop if:!<player.item_in_hand.script.exists>
         - stop if:!<player.item_in_hand.script.name.equals[DisplayText_Editing]>
         - define entity <player.proc[DisplayText_getEntity]>
-
         - define book   <context.book>
         - define pages  <[book].book_pages>
         - foreach <[pages]>:
             - define text:->:<[value].proc[displaytext_proc_spaceseparated]>
-
         - adjust <[entity]> text:<[text].separated_by[<&nl>]>
 
         after player right clicks block with:DisplayText_Book:
@@ -186,6 +187,15 @@ DisplayText_Select:
     - run displaytext_setentity def:<[entity]>
     - stop if:<player.inventory.contains_item[DisplayText_Book]>
     - give displaytext_book
+
+DisplayText_Background:
+    # todo: background custom color
+    # todo: reset background
+    # todo: remove background
+    type: task
+    script:
+    - define book <item[writable_book].with[book_author=DisplayText;book_title=BackgroundText;book_pages=<&r>]>
+    - give <[book]>
 
 DisplayText_Proc_SpaceSeparated:
     type: procedure
