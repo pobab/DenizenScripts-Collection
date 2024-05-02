@@ -1,5 +1,4 @@
-# todo: feature rotation/flip
-# todo: tiap subcommand dibikin task script
+
 DisplayText_Entity:
     type: entity
     debug: false
@@ -53,7 +52,9 @@ DisplayText_Command:
         - stop
 
     - define subcommand <[args].get[1]>
+    # todo: tiap subcommand dibikin task script
     - choose <[subcommand]>:
+        # todo: tambahin display text ditulis pakai writable book
         - case add:
             - define location   <player.eye_location.ray_trace.forward[0.01]>
             - define text       <[args].get[2].to[<[args].size>]>
@@ -78,6 +79,7 @@ DisplayText_Command:
             - define written    <map.with[pages].as[<[text]>]>
             - give <item[DisplayText_Editing].with[book=<[written]>;lore=<&7><[text].color[<&7>]>]>
 
+        # todo: feature rotation/flip
         - case move:
             - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
             - define direction <[args].get[2]>

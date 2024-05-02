@@ -2,8 +2,6 @@ WarnPlayer_WritableBook:
     type: item
     material: writable_book
     display name: <&e>Warning Book
-    lore:
-    - <&7>Write their warn
 
 
 WarnPlayer_Command:
@@ -21,6 +19,8 @@ WarnPlayer_Command:
             - stop
         - stop if:<player.inventory.contains_item[warnplayer_writablebook]>
         - give warnplayer_writablebook
+        - narrate "<&6>Signs the book to complete"
+        - narrate "<&4>REMEMBER: <&c>Write the title as their warning"
         - stop
 
     - define subcommand <[args].get[1]>
@@ -30,6 +30,8 @@ WarnPlayer_Command:
     - flag <player> warn.target:<[target]>
 
 
+#todo: edit
+#todo: delete
 WarnPlayer_Listener:
     type: world
     events:
@@ -37,22 +39,16 @@ WarnPlayer_Listener:
         - stop if:!<player.item_in_hand.script.name.equals[WarnPlayer_WritableBook].is_truthy>
         - narrate "<&6>Signs the book to complete"
         - narrate "<&4>REMEMBER: <&c>Write the title as their warning"
-        - announce <context.book>
 
-        on player signs book:
-        - stop if:!<player.item_in_hand.script.name.equals[WarnPlayer_WritableBook].is_truthy>
+        after player signs book:
+        - stop if:!<context.old_book.script.name.equals[WarnPlayer_WritableBook].is_truthy>
         - stop if:!<player.has_flag[warn.target]>
         - define target <player.flag[warn.target]>
         - define uuid   <util.random_uuid>
         - define time   <util.time_now>
         - define book   <context.book>
-        - flag <[book]> time:<[time]>
-        - announce <[book]>
-        # - flag <[target]> warn.<[uuid]>.title:<[title]>
-        # - flag <[target]> warn.<[uuid]>.time:<[time]>
-        # - flag <[target]> warn.<[uuid]>.moderator:<player>
-        - flag <[target]> warn.<[uuid]>.description:<[book].book_pages>
-        # - take item:<[book]> from:<player.inventory>
+        - flag <[target]> warn.<[uuid]>:<item[written_book].with[book_author=<player.uuid>;book_title=<[book].book_title>;book_pages=<[book].book_pages>].with_flag[time:<[time]>]>
+        #- take item:<[book]> from:<player.inventory>
 
 
 WarnPlayer_Book:
@@ -66,4 +62,19 @@ WarnPlayer_Book:
         - define "pages:->:<element[<&lb>Click to write<&rb>].on_click[/warn]>"
         - define book_pages <[pages].separated_by[<&nl>]>
         - determine <item[written_book].with[book_author=Atmin;book_title=Warnings;book_pages=<[book_pages]>]>
-    - determine <item[written_book].with[book_author=Atmin;book_title=Warnings;book_pages=YaY]>
+
+    - define warnings <player.flag[warn].deep_exclude[target].keys>
+    - foreach <[warnings]>:
+        - define hover          <list>
+        - define book           <player.flag[warn].get[<[value]>]>
+        - define title          <[book].book_title>
+        - define time           <[book].flag[time]>
+        - define description    <[book].book_pages>
+        - define hover:->:<&6><[title]>
+        - define hover:->:<[description].space_separated>
+        - define "hover:->:<&7>Time: <&f><[time].format[dd/MM/yyyy HH:mm]>"
+        - define "hover:->:<&7>Moderator: <&f><[book].book_author.as[player].name>"
+        - define "pages:->:<[loop_index]>. <[title].on_hover[<[hover].separated_by[<&nl>]>].on_click[/warn <[value]>]>"
+    - define "pages:->:<element[<&lb>Click to write<&rb>].on_click[/warn]>"
+    - define book_pages <[pages].separated_by[<&nl>]>
+    - determine <item[written_book].with[book_author=Atmin;book_title=Warnings;book_pages=<[book_pages]>]>
