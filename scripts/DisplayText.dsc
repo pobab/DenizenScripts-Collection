@@ -4,7 +4,13 @@ DisplayText_Entity:
     debug: false
     entity_type: text_display
 
-DisplayText_Editing:
+DisplayText_Write:
+    type: item
+    debug: false
+    material: writable_book
+    display name: <&e>DisplayText Writing
+
+DisplayText_Edit:
     type: item
     debug: false
     material: writable_book
@@ -56,9 +62,7 @@ DisplayText_Command:
     - choose <[subcommand]>:
         # todo: tambahin display text ditulis pakai writable book
         - case add:
-            - define location   <player.eye_location.ray_trace.forward[0.01]>
-            - define text       <[args].get[2].to[<[args].size>]>
-            - spawn DisplayText_Entity[text=<[text]>] <[location]>
+            - give displaytext_write
 
         - case removeall:
             - define entityText <player.world.entities[DisplayText_Entity]>
@@ -77,7 +81,7 @@ DisplayText_Command:
             - define entity     <player.proc[DisplayText_getEntity]>
             - define text       <[entity].text.split[<&nl>]>
             - define written    <map.with[pages].as[<[text]>]>
-            - give <item[DisplayText_Editing].with[book=<[written]>;lore=<&7><[text].color[<&7>]>]>
+            - give <item[DisplayText_Edit].with[book=<[written]>;lore=<&7><[text].color[<&7>]>]>
 
         # todo: feature rotation/flip
         - case move:
@@ -122,13 +126,16 @@ DisplayText_Listener:
     debug: false
     events:
         on player edits book:
-        - stop if:!<player.item_in_hand.script.name.equals[DisplayText_Editing].is_truthy>
-        - define entity <player.proc[DisplayText_getEntity]>
+        - stop if:!<player.item_in_hand.script.exists>
+        - define script <player.item_in_hand.script>
         - define book   <context.book>
         - define pages  <[book].book_pages>
-        - foreach <[pages]>:
-            - define text:->:<[value].proc[displaytext_proc_spaceseparated]>
-        - adjust <[entity]> text:<[text].separated_by[<&nl>]>
+        - if <[script].name> == DisplayText_Write:
+            - fakespawn <entity[displaytext_entity].with[text=<[book].proc[displaytext_writing]>]> <player.eye_location.ray_trace.forward[0.01]>
+        - else if:<[script].name> == DisplayText_Edit:
+            - define entity <player.proc[DisplayText_getEntity]>
+            - adjust <[entity]> text:<[book].proc[displaytext_writing]>
+        # todo: sign to complete the edit
 
         after player right clicks block with:DisplayText_Book:
         - adjust <player> show_book:DisplayText_Selected
@@ -139,8 +146,20 @@ DisplayText_Listener:
         - teleport <[entity]> <player.eye_location.ray_trace.forward[0.01]>
 
 
+DisplayText_Writing:
+    type: procedure
+    debug: false
+    definitions: book
+    script:
+    - define pages <[book].book_pages>
+    - foreach <[pages]>:
+        - define text:->:<[value].proc[displaytext_proc_spaceseparated]>
+    - determine <[text].separated_by[<&nl>]>
+
+
 DisplayText_Rescale:
     type: task
+    debug: false
     definitions: fluctuate|shape|value
     script:
     - define entity <player.proc[displaytext_getentity]>
