@@ -3,10 +3,8 @@ API_TextOffset:
     debug: false
     definitions: int
     script:
-    - if !<[int].is_truthy>:
-        - determine <&c>Invalid <[int].is_truthy><&f>
-    - if !<[int].is_integer>:
-        - determine "<&c>Invalid integer<&f>"
+    - determine "<&c>args isn't integer!<&f>" if:!<[int].is_integer>
+    - determine "<&c>Invalid integer!<&f>" if:!<[int].is_truthy>
 
     - define spacing <list>
     - if <[int].contains_text[-]>:
