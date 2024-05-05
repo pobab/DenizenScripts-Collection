@@ -8,37 +8,20 @@ API_GUI_Listener:
     events:
         on player clicks in inventory:
         - inject <script> path:check_gui_script
-
         - if <[listener_keys].contains[listener.on click]>:
             - inject <[script]> "path:listener.on click"
 
-        #
-
-        #
         on player closes inventory:
         - inject <script> path:check_gui_script
-
         - if <[listener_keys].contains[listener.on close]>:
             - inject <[script]> "path:listener.on close"
 
-        #
-
-        #
         on player opens inventory:
         - inject <script> path:check_gui_script
-
         - if <[listener_keys].contains[listener.on open]>:
             - inject <[script]> "path:listener.on open"
 
-        #
-
-        #
         on player drags in inventory:
         - inject <script> path:check_gui_script
-
         - if <[listener_keys].contains[listener.on drags item]>:
             - inject <[script]> "path:listener.on drags item"
-
-        #
-
-#
