@@ -1,4 +1,3 @@
-
 DisplayText_Entity:
     type: entity
     debug: false
@@ -131,13 +130,40 @@ DisplayText_Listener:
         - define book   <context.book>
         - define pages  <[book].book_pages>
         - if <[script].name> == DisplayText_Write:
-            - fakespawn <entity[displaytext_entity].with[text=<[book].proc[displaytext_writing]>]> <player.eye_location.ray_trace.forward[0.01]>
+            - if !<player.fake_entities.filter[advanced_matches[text_display]].is_empty>:
+                - define location <player.fake_entities.filter[advanced_matches[text_display]].first.location>
+                - fakespawn <player.fake_entities.filter[advanced_matches[text_display]].first> cancel
+                - fakespawn <entity[displaytext_entity].with[text=<[book].proc[displaytext_writing]>]> <[location]> duration:3m
+            - else:
+                - fakespawn <entity[displaytext_entity].with[text=<[book].proc[displaytext_writing]>]> <player.eye_location.ray_trace.forward[0.01]> duration:3m
             - narrate "<&6>Signs the book to complete"
             - narrate "<&4>REMINDER: <&c>Write the title as the name of Display Text"
         - else if:<[script].name> == DisplayText_Edit:
+            - define entity     <player.proc[DisplayText_getEntity]>
+            - define location   <[entity].location>
+            - adjust <player> hide_entity:<[entity]>
+            - fakespawn <entity[displaytext_entity].with[text=<[book].proc[displaytext_writing]>]> <[location]>
+            - flag <[entity]> displaytext.hidden
+        after player signs book:
+        - stop if:!<context.old_book.script.exists>
+        - define script <context.old_book.script>
+        - define book   <context.book>
+        - if <[script].name> == DisplayText_Write:
+            - define location <player.fake_entities.filter[advanced_matches[text_display]].first.location>
+            - spawn <entity[displaytext_entity].with[text=<[book].proc[displaytext_writing]>]> <[location]>
+        - else if <[script].name> == DisplayText_Edit:
             - define entity <player.proc[DisplayText_getEntity]>
+            - if <[entity].has_flag[displaytext.hidden]>:
+                - flag <[entity]> displaytext:!
             - adjust <[entity]> text:<[book].proc[displaytext_writing]>
-        # todo: sign to complete the edit
+        # todo: flag the title to the entity
+        # todo: remove the signed book
+        - fakespawn <player.fake_entities.filter[advanced_matches[text_display]].first> cancel
+        on player quit:
+        - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
+        - define entity <player.proc[DisplayText_getEntity]>
+        - stop if:!<[entity].has_flag[displaytext.hidden]>
+        - adjust <player> show_entity:<[entity]>
 
         after player right clicks block with:DisplayText_Book:
         - adjust <player> show_book:DisplayText_Selected
@@ -190,6 +216,7 @@ DisplayText_Selecting:
         - stop
     - foreach <[entitiesText]>:
         - define text       <[value].text.proc[displaytext_proc_spaceseparated]>
+        # todo: show the title of signed book
         - define title      <[text].substring[1,17]>
         - define hover      "<[text]><&nl><&e>Click to settings"
         - define display    "<[loop_index]>. <[title].color[<&9>]><&9>..."
