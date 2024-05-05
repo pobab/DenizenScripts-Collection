@@ -1,18 +1,16 @@
 API_TextOffset:
     type: procedure
     debug: false
-    definitions: handler|int
+    definitions: int
     script:
-    - if !<[handler].is_truthy>:
-        - determine "Invalid handler"
-
     - if !<[int].is_truthy>:
-        - determine <&c><[int].is_truthy><&f>
+        - determine <&c>Invalid <[int].is_truthy><&f>
     - if !<[int].is_integer>:
         - determine "<&c>Invalid integer<&f>"
 
     - define spacing <list>
-    - if <[handler]> == -:
+    - if <[int].contains_text[-]>:
+        - define int <[int].after[-]>
         - while <[int]> > 0:
             - if <[int]> >= 1024:
                 - define int:-:1024
@@ -56,8 +54,7 @@ API_TextOffset:
             - else:
                 - define int:-:1
                 - define spacing:->:<&chr[F801]>
-
-    - if <[handler]> == +:
+    - else:
         - while <[int]> > 0:
             - if <[int]> >= 1024:
                 - define int:-:1024
@@ -101,7 +98,5 @@ API_TextOffset:
             - else:
                 - define int:-:1
                 - define spacing:->:<&chr[F821]>
-    - default:
-        - determine "Invalid handler"
 
     - determine <[spacing].unseparated>
