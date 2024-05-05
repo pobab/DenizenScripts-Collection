@@ -132,6 +132,8 @@ DisplayText_Listener:
         - define pages  <[book].book_pages>
         - if <[script].name> == DisplayText_Write:
             - fakespawn <entity[displaytext_entity].with[text=<[book].proc[displaytext_writing]>]> <player.eye_location.ray_trace.forward[0.01]>
+            - narrate "<&6>Signs the book to complete"
+            - narrate "<&4>REMINDER: <&c>Write the title as the name of Display Text"
         - else if:<[script].name> == DisplayText_Edit:
             - define entity <player.proc[DisplayText_getEntity]>
             - adjust <[entity]> text:<[book].proc[displaytext_writing]>
