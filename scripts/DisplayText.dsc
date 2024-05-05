@@ -61,10 +61,15 @@ DisplayText_Command:
     - if <[subcommand]> == add:
         - give displaytext_write
 
-    - if <[subcommand]> == removeall:
-        - define entityText <player.world.entities[DisplayText_Entity]>
-        - remove <[entityText]>
-        - narrate "<&c>all DisplayText removed"
+    - if <[subcommand]> == remove:
+        - define decide <[args].get[2]>
+        - if <[decide]> == all:
+            - define entityText <player.world.entities[DisplayText_Entity]>
+            - remove <[entityText]>
+            - narrate "<&c>all DisplayText removed"
+            - stop
+        - remove <entity[<[decide]>]>
+        - narrate "<&c>DisplayText removed"
 
     - if <[subcommand]> == select:
         - if !<[args].get[2].exists>:
