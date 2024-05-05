@@ -34,6 +34,7 @@ WarnPlayer_Command:
 #todo: delete
 WarnPlayer_Listener:
     type: world
+    debug: false
     events:
         on player edits book:
         - stop if:!<player.item_in_hand.script.name.equals[WarnPlayer_WritableBook].is_truthy>
