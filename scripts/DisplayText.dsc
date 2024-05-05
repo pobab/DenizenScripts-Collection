@@ -58,66 +58,64 @@ DisplayText_Command:
 
     - define subcommand <[args].get[1]>
     # todo: tiap subcommand dibikin task script
-    - choose <[subcommand]>:
-        # todo: tambahin display text ditulis pakai writable book
-        - case add:
-            - give displaytext_write
+    - if <[subcommand]> == add:
+        - give displaytext_write
 
-        - case removeall:
-            - define entityText <player.world.entities[DisplayText_Entity]>
-            - remove <[entityText]>
-            - narrate "<&c>all DisplayText removed"
+    - if <[subcommand]> == removeall:
+        - define entityText <player.world.entities[DisplayText_Entity]>
+        - remove <[entityText]>
+        - narrate "<&c>all DisplayText removed"
 
-        - case select:
-            - if !<[args].get[2].exists>:
-                - run DisplayText_Selecting
-                - stop
-            - define selecting <[args].get[2]>
-            - run DisplayText_Select def:<[selecting]>
+    - if <[subcommand]> == select:
+        - if !<[args].get[2].exists>:
+            - run DisplayText_Selecting
+            - stop
+        - define selecting <[args].get[2]>
+        - run DisplayText_Select def:<[selecting]>
 
-        - case edit:
-            - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
+    - if <[subcommand]> == edit:
+        - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
+        - define entity     <player.proc[DisplayText_getEntity]>
+        - define text       <[entity].text.split[<&nl>]>
+        - define written    <map.with[pages].as[<[text]>]>
+        - give <item[DisplayText_Edit].with[book=<[written]>;lore=<&7><[text].color[<&7>]>]>
+
+    # todo: feature rotation/flip
+    - if <[subcommand]> == move:
+        - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
+        - define direction <[args].get[2]>
+        - if <[direction]> == forward:
             - define entity     <player.proc[DisplayText_getEntity]>
-            - define text       <[entity].text.split[<&nl>]>
-            - define written    <map.with[pages].as[<[text]>]>
-            - give <item[DisplayText_Edit].with[book=<[written]>;lore=<&7><[text].color[<&7>]>]>
+            - define location   <[entity].location>
+            - teleport <[entity]> <[location].forward[0.1]>
+        - if <[direction]> == backward:
+            - define entity     <player.proc[DisplayText_getEntity]>
+            - define location   <[entity].location>
+            - teleport <[entity]> <[location].backward[0.1]>
 
-        # todo: feature rotation/flip
-        - case move:
-            - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
-            - define direction <[args].get[2]>
-            - if <[direction]> == forward:
-                - define entity     <player.proc[DisplayText_getEntity]>
-                - define location   <[entity].location>
-                - teleport <[entity]> <[location].forward[0.1]>
-            - if <[direction]> == backward:
-                - define entity     <player.proc[DisplayText_getEntity]>
-                - define location   <[entity].location>
-                - teleport <[entity]> <[location].backward[0.1]>
+    - if <[subcommand]> == scale:
+        - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
+        - stop if:<[args].size.is_less_than[3]>
+        - define fluctuate  <[args].get[2]>
+        - define shape      <[args].get[3]>
+        - define value      <[args].get[4].if_null[1]>
+        - run displaytext_rescale def:<[fluctuate]>|<[shape]>|<[value]>
 
-        - case scale:
-            - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
-            - stop if:<[args].size.is_less_than[3]>
-            - define fluctuate  <[args].get[2]>
-            - define shape      <[args].get[3]>
-            - define value      <[args].get[4].if_null[1]>
-            - run displaytext_rescale def:<[fluctuate]>|<[shape]>|<[value]>
+    - if <[subcommand]> == text_shadowed:
+        - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
+        - define entity <player.proc[DisplayText_getEntity]>
+        - if <[entity].text_shadowed>:
+            - adjust <[entity]> text_shadowed:false
+        - else:
+            - adjust <[entity]> text_shadowed:true
 
-        - case text_shadowed:
-            - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
-            - define entity <player.proc[DisplayText_getEntity]>
-            - if <[entity].text_shadowed>:
-                - adjust <[entity]> text_shadowed:false
-            - else:
-                - adjust <[entity]> text_shadowed:true
-
-        - case background_color:
-            - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
-            - define entity <player.proc[DisplayText_getEntity]>
-            - if <[entity].text_shadowed>:
-                - adjust <[entity]> background_color:<color[0,0,0,0]>
-            - else:
-                - adjust <[entity]> background_color:<color[0,0,0,64]>
+    - if <[subcommand]> == background_color:
+        - stop if:!<player.proc[DisplayText_getEntity].is_truthy>
+        - define entity <player.proc[DisplayText_getEntity]>
+        - if <[entity].text_shadowed>:
+            - adjust <[entity]> background_color:<color[0,0,0,0]>
+        - else:
+            - adjust <[entity]> background_color:<color[0,0,0,64]>
 
 
 DisplayText_Listener:
@@ -183,7 +181,6 @@ DisplayText_Writing:
     - foreach <[pages]>:
         - define text:->:<[value].proc[displaytext_proc_spaceseparated]>
     - determine <[text].separated_by[<&nl>]>
-
 
 DisplayText_Rescale:
     type: task
