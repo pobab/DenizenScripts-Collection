@@ -159,7 +159,7 @@ DisplayText_Listener:
             - if <[entity].has_flag[displaytext.hidden]>:
                 - flag <[entity]> displaytext:!
             - adjust <[entity]> text:<[book].proc[displaytext_writing]>
-        # todo: flag the title to the entity
+        - flag <[entity]> displaytext.title:<[book].book_title>
         # todo: remove the signed book
         - fakespawn <player.fake_entities.filter[advanced_matches[text_display]].first> cancel
         on player quit:
@@ -184,8 +184,23 @@ DisplayText_Writing:
     script:
     - define pages <[book].book_pages>
     - foreach <[pages]>:
+        - if <[value].contains_text[;]>:
+            - define value <[value].proc[DisplayText_ParsingTextOffset]>
         - define text:->:<[value].proc[displaytext_proc_spaceseparated]>
     - determine <[text].separated_by[<&nl>]>
+
+DisplayText_ParsingTextOffset:
+    type: procedure
+    definitions: rawText
+    script:
+    - define split <[rawText].split[;]>
+    - determine <[rawText].first> if:<[split].size.equals[1]>
+    - foreach <[split]> as:raw:
+        - if <[raw].proc[util_textidentifyint]>:
+            - define text <[raw].proc[api_textoffset]>
+        - else:
+            - define text <[raw]>
+    - determine true
 
 DisplayText_Rescale:
     type: task
@@ -218,8 +233,7 @@ DisplayText_Selecting:
         - stop
     - foreach <[entitiesText]>:
         - define text       <[value].text.proc[displaytext_proc_spaceseparated]>
-        # todo: show the title of signed book
-        - define title      <[text].substring[1,17]>
+        - define title      <[value].flag[displaytext.title].if_null[<[text].substring[1,17]>]>
         - define hover      "<[text]><&nl><&e>Click to settings"
         - define display    "<[loop_index]>. <[title].color[<&9>]><&9>..."
         - define textFormat:->:<[display].on_hover[<[hover]>].on_click[/dtext select <[value]>]>

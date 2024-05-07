@@ -3,14 +3,15 @@ API_TextOffset:
     debug: false
     definitions: int
     script:
-    - determine "<&c>args isn't integer!<&f>" if:!<[int].is_integer>
     - determine "<&c>Invalid integer!<&f>" if:!<[int].is_truthy>
+    - determine "<&c>args isn't integer!<&f>" if:!<[int].is_integer.or[<[int].contains_text[-]>]>
 
     - define char    82
     - define spacing <list>
     - if <[int].contains_text[-]>:
         - define char 80
         - define int  <[int].after[-]>
+        - determine "<&c>args isn't integer!<&f>" if:!<[int].is_integer>
     - while <[int]> > 0:
         - if <[int]> >= 1024:
             - define int:-:1024
