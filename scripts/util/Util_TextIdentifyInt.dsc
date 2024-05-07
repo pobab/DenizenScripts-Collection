@@ -1,5 +1,6 @@
 Util_TextIdentifyInt:
     type: procedure
+    description: identify text if that had using API_TextOffset
     definitions: text
     script:
     - define negative <[text].after[-]> if:<[text].contains_text[-]>
