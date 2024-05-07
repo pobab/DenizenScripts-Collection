@@ -1,5 +1,6 @@
 Util_TextIdentifyInt:
     type: procedure
+    debug: false
     description: identify text if that had using API_TextOffset
     definitions: text
     script:
