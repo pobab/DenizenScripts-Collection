@@ -29,11 +29,12 @@ Dialog_Data:
     - raja pobab karena istri mereka
     - sang raja adalah penikmat tobrut
     - aku sebagai kesatria hitam bangga
-    - karena guruku ialah fiqun
+    - karena guruku ialah fiqun master
 
 
 Dialog_Talk:
     type: task
+    debug: false
     definitions: def
     script:
     - define data <script[dialog_data].data_key[text]>
@@ -41,8 +42,11 @@ Dialog_Talk:
     - foreach <[data]>:
         - if <[loop_index]> > 1:
             - define text <[data].get[<[loop_index].sub[1]>]>
+            # Text Offset to make the dialog text align to left
             - if <[text].contains_text[<&sp>]>:
-                - define result:->:<element[-<[text].text_width>].proc[api_textoffset]><element[<[text]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
+                - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
+                # count text width of space text
+                - define result:->:<element[<[text]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
             - else:
                 - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
         - define result:->:<[value].font[custom/dialog/text/row<[loop_index]>]>
