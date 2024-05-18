@@ -18,5 +18,11 @@ MobsBehaviour_Listener:
         - flag <context.entity> MobsBehaviour.targets:->:<player> expire:1m
 
 
+        # todo: only spawn in the end
         on phantom spawns because nutural:
         - determine cancelled if:!<context.location.world.name.contains_text[the_end]>
+
+
+        # todo: only spawn in mineshaft
+        on creeper spawns because nutural:
+        - determine cancelled
