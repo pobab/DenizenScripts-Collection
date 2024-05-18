@@ -16,3 +16,7 @@ MobsBehaviour_Listener:
         - stop if:!<context.damager.flag[MobsBehaviour.targets].contains[<player>].is_truthy>
         - flag <context.entity> MobsBehaviour.targets:<-:<player>
         - flag <context.entity> MobsBehaviour.targets:->:<player> expire:1m
+
+
+        on phantom spawns because nutural:
+        - determine cancelled if:!<context.location.world.name.contains_text[the_end]>
