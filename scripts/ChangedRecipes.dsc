@@ -16,6 +16,7 @@ ChangedRecipes_Listener:
 
 ChangedRecipes_IronHelmet:
     type: item
+    no_id: true
     debug: false
     material: iron_helmet
     recipes:
@@ -28,6 +29,7 @@ ChangedRecipes_IronHelmet:
 
 ChangedRecipes_IronChestplate:
     type: item
+    no_id: true
     debug: false
     material: iron_chestplate
     recipes:
@@ -40,6 +42,7 @@ ChangedRecipes_IronChestplate:
 
 ChangedRecipes_IronLeggings:
     type: item
+    no_id: true
     debug: false
     material: iron_Leggings
     recipes:
@@ -52,6 +55,7 @@ ChangedRecipes_IronLeggings:
 
 ChangedRecipes_IronBoots:
     type: item
+    no_id: true
     debug: false
     material: iron_boots
     recipes:
@@ -64,6 +68,7 @@ ChangedRecipes_IronBoots:
 
 ChangedRecipes_DiamondHelmet:
     type: item
+    no_id: true
     debug: false
     material: diamond_helmet
     recipes:
@@ -76,6 +81,7 @@ ChangedRecipes_DiamondHelmet:
 
 ChangedRecipes_DiamondChestplate:
     type: item
+    no_id: true
     material: diamond_chestplate
     recipes:
         1:
@@ -87,6 +93,7 @@ ChangedRecipes_DiamondChestplate:
 
 ChangedRecipes_DiamondLeggings:
     type: item
+    no_id: true
     debug: false
     material: diamond_Leggings
     recipes:
@@ -99,6 +106,7 @@ ChangedRecipes_DiamondLeggings:
 
 ChangedRecipes_DiamondBoots:
     type: item
+    no_id: true
     debug: false
     material: diamond_boots
     recipes:
@@ -111,6 +119,7 @@ ChangedRecipes_DiamondBoots:
 
 ChangedRecipes_Beacon:
     type: item
+    no_id: true
     debug: false
     material: beacon
     recipes:
@@ -123,6 +132,7 @@ ChangedRecipes_Beacon:
 
 ChangedRecipes_ShulkerBox:
     type: item
+    no_id: true
     debug: false
     material: shulker_box
     recipes:
@@ -135,6 +145,7 @@ ChangedRecipes_ShulkerBox:
 
 ChangedRecipes_FireworkRocket:
     type: item
+    no_id: true
     debug: false
     material: firework_rocket
     recipes:
@@ -144,6 +155,7 @@ ChangedRecipes_FireworkRocket:
 
 ChangedRecipes_NetheriteIngot:
     type: item
+    no_id: true
     debug: false
     material: netherite_ingot
     recipes:
@@ -153,6 +165,7 @@ ChangedRecipes_NetheriteIngot:
 
 ChangedRecipes_Chest:
     type: item
+    no_id: true
     debug: false
     material: Chest
     recipes:
