@@ -7,6 +7,11 @@ MobsBehaviour_Listener:
         - determine no_drops
 
 
+        # Prevent drop EXP in world the end
+        on enderman dies:
+        - determine no_xp if:<context.entity.location.world.name.contains_text[the_end]>
+
+
         # Witch will attack player when player attack them first
         on witch targets player:
         - determine cancelled if:!<context.entity.has_flag[MobsBehaviour.targets]>
