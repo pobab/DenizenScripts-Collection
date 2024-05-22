@@ -3,8 +3,8 @@ Komisi_Listener:
     events:
         on player fishes entity:
         - stop if:<context.xp.is_less_than_or_equal_to[0]>
-        - define object <context.item.material.name>
-        - run Komisi_progressTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[fisherman]> def.object:<[object]>
+        - define target <context.item.material.name>
+        - run Komisi_progressTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[fisherman]> def.target:<[target]> def.value:+1
 
 
 Komisi_newTask:
@@ -36,15 +36,23 @@ Komisi_uuidTask:
     - foreach <[task]>:
         - define uuid:->:<[value].split[.].first>
     - determine <[uuid].deduplicate> if:<[uuid].exists>
-    - determine <list>
+    - determine <[player].flag[komisi].keys>
 
 
 Komisi_progressTask:
     type: task
-    definitions: player|uuid|object|value
+    definitions: player|uuid|target|value
     script:
     - foreach <[uuid]> as:id:
         - define profession <[player].flag[komisi.<[id]>].keys.first>
-        - define target <[player].flag[komisi.<[id]>.<[profession]>].keys.first>
-        - foreach next if:!<[target].equals[<[object]>]>
+        - define object     <[player].flag[komisi.<[id]>.<[profession]>].keys.first>
+        - foreach next if:!<[object].equals[<[target]>]>
+
+        - define recent <[player].flag[komisi.<[id]>.<[profession]>.<[object]>.recent]>
+        - define target <[player].flag[komisi.<[id]>.<[profession]>.<[object]>.quantity]>
+        - if <[value].contains_text[+]>:
+            # todo: bikin fungsi ketika komisi completed
+            - define value  <[value].after[+]>
+            - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[recent].add[<[value]>]>
+            - narrate progress_<&e><[profession]>_<&b><[object]>_<&a><[value]>_<&c><[recent]>
 
