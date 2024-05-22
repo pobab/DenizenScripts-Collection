@@ -4,7 +4,7 @@ Komisi_Listener:
         on player fishes entity:
         - stop if:<context.xp.is_less_than_or_equal_to[0]>
         - define object <context.item.material.name>
-        - run Komisi_progressTask def.player:<player> def.uuid:<player.proc[komisi_gettask].context[fisherman]> def.object:<[object]>
+        - run Komisi_progressTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[fisherman]> def.object:<[object]>
 
 
 Komisi_newTask:
@@ -28,15 +28,14 @@ Komisi_newTask:
     - flag <[player]> komisi.<[uuid]>.<[profession]>.<[target]>.quantity:<[quantity]>
 
 
-Komisi_getTask:
+Komisi_uuidTask:
     type: procedure
     definitions: player|profession
     script:
-    - if <[profession].exists>:
-        - define task <[player].flag[komisi].deep_keys.filter[contains_text[<[profession]>]]>
-        - foreach <[task]>:
-            - define uuid:->:<[value].split[.].first>
-        - determine <[uuid].deduplicate> if:<[uuid].exists>
+    - define task <[player].flag[komisi].deep_keys.filter[contains_text[<[profession]>]]>
+    - foreach <[task]>:
+        - define uuid:->:<[value].split[.].first>
+    - determine <[uuid].deduplicate> if:<[uuid].exists>
     - determine <list>
 
 
@@ -47,5 +46,5 @@ Komisi_progressTask:
     - foreach <[uuid]> as:id:
         - define profession <[player].flag[komisi.<[id]>].keys.first>
         - define target <[player].flag[komisi.<[id]>.<[profession]>].keys.first>
-        - narrate <&c>YAY if:<[target].equals[<[object]>]>
+        - foreach next if:!<[target].equals[<[object]>]>
 
