@@ -49,10 +49,11 @@ Komisi_progressTask:
         - foreach next if:!<[object].equals[<[target]>]>
 
         - define recent <[player].flag[komisi.<[id]>.<[profession]>.<[object]>.recent]>
-        - define target <[player].flag[komisi.<[id]>.<[profession]>.<[object]>.quantity]>
+        - define goal   <[player].flag[komisi.<[id]>.<[profession]>.<[object]>.quantity]>
         - if <[value].contains_text[+]>:
             # todo: bikin fungsi ketika komisi completed
             - define value  <[value].after[+]>
+            - foreach next if:<[recent].is_more_than_or_equal_to[<[goal]>]>
             - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[recent].add[<[value]>]>
             - narrate progress_<&e><[profession]>_<&b><[object]>_<&a><[value]>_<&c><[recent]>
 
