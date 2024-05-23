@@ -4,7 +4,7 @@ Komisi_Listener:
         on player fishes entity:
         - stop if:<context.xp.is_less_than_or_equal_to[0]>
         - define target <context.item.material.name>
-        - run Komisi_progressTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[fisherman]> def.target:<[target]> def.value:+1
+        - run Komisi_setTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[fisherman]> def.target:<[target]> def.value:+1
 
 
 Komisi_newTask:
@@ -54,21 +54,31 @@ Komisi_getTask:
     - determine <[player].flag[komisi.<[uuid]>.<[profession]>.<[target]>.quantity]> if:<[data].equals[quantity]>
 
 
-Komisi_progressTask:
+Komisi_setTask:
     type: task
     definitions: player|uuid|target|value
     script:
     - foreach <[uuid]> as:id:
         - define profession <[player].flag[komisi.<[id]>].keys.first>
         - define object     <[player].flag[komisi.<[id]>.<[profession]>].keys.first>
+        - define recent     <[player].flag[komisi.<[id]>.<[profession]>.<[object]>.recent]>
+        - define goal       <[player].flag[komisi.<[id]>.<[profession]>.<[object]>.quantity]>
+        - if <[target].contains_text[=]>:
+            - define target <[value].after[=]>
+            - flag <[player]> komisi.<[id]>.<[profession]>.<[target]>.recent:<[recent]>
+            - flag <[player]> komisi.<[id]>.<[profession]>.<[target]>.quantity:<[goal]>
+            - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>:!
+            - define object <[target]>
         - foreach next if:!<[object].equals[<[target]>]>
 
-        - define recent <[player].flag[komisi.<[id]>.<[profession]>.<[object]>.recent]>
-        - define goal   <[player].flag[komisi.<[id]>.<[profession]>.<[object]>.quantity]>
+        - foreach next if:!<[value].exists>
         - if <[value].contains_text[+]>:
             # todo: bikin fungsi ketika komisi completed
-            - define value  <[value].after[+]>
+            - define value <[value].after[+]>
             - foreach next if:<[recent].is_more_than_or_equal_to[<[goal]>]>
             - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[recent].add[<[value]>]>
             - narrate progress_<&e><[profession]>_<&b><[object]>_<&a><[value]>_<&c><[recent]>
+        - if <[value].contains_text[=]>:
+            - define value <[value].after[=]>
+            - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.quantity:<[value]>
 
