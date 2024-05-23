@@ -32,11 +32,26 @@ Komisi_uuidTask:
     type: procedure
     definitions: player|profession
     script:
+    - determine <list> if:!<[player].has_flag[komisi]>
+    - determine <[player].flag[komisi].keys> if:!<[profession].exists>
+
     - define task <[player].flag[komisi].deep_keys.filter[contains_text[<[profession]>]]>
     - foreach <[task]>:
         - define uuid:->:<[value].split[.].first>
     - determine <[uuid].deduplicate> if:<[uuid].exists>
-    - determine <[player].flag[komisi].keys>
+
+
+Komisi_getTask:
+    type: procedure
+    definitions: player|uuid|data
+    script:
+    - determine null if:!<[player].has_flag[komisi]>
+    - determine <[player].flag[komisi.<[uuid]>].keys.first>                         if:<[data].equals[profession]>
+    - define profession <[player].proc[<script.name>].context[<[uuid]>|profession]>
+    - determine <[player].flag[komisi.<[uuid]>.<[profession]>].keys.first>          if:<[data].equals[target]>
+    - define target     <[player].proc[<script.name>].context[<[uuid]>|target]>
+    - determine <[player].flag[komisi.<[uuid]>.<[profession]>.<[target]>.recent]>   if:<[data].equals[recent]>
+    - determine <[player].flag[komisi.<[uuid]>.<[profession]>.<[target]>.quantity]> if:<[data].equals[quantity]>
 
 
 Komisi_progressTask:
