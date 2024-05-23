@@ -78,7 +78,12 @@ Komisi_setTask:
             - foreach next if:<[recent].is_more_than_or_equal_to[<[goal]>]>
             - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[recent].add[<[value]>]>
             - narrate progress_<&e><[profession]>_<&b><[object]>_<&a><[value]>_<&c><[recent]>
-        - if <[value].contains_text[=]>:
+        - else if <[value].contains_text[-]>:
+            - define value <[value].after[-]>
+            - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[recent].sub[<[value]>]>
+        - else if <[value].contains_text[=]>:
             - define value <[value].after[=]>
+            - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[value]>
+        - else:
             - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.quantity:<[value]>
 
