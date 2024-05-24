@@ -2,6 +2,14 @@ Komisi_Listener:
     type: world
     events:
         # todo: lengkapi tiap tugas untuk dijadikan komisi
+        on player breaks *_ore:
+        - define object <context.material.name>
+        - run Komisi_setTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[armorer]> def.object:<[object]> def.value:+1
+
+        on player kills entity:
+        - define object <context.entity.entity_type>
+        - run Komisi_setTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[butcher]> def.object:<[object]> def.value:+1
+
         on player fishes entity:
         - stop if:<context.xp.is_less_than_or_equal_to[0]>
         - define object <context.item.material.name>
@@ -12,11 +20,10 @@ Komisi_newTask:
     type: task
     definitions: player|entity|quantity
     script:
-    - define uuid <util.random_uuid>
+    - define uuid       <util.random_uuid>
+    - define quantity   <util.random.int[1].to[16]> if:!<[quantity].exists>
     - if <[entity].exists>:
-        - define uuid       <[entity].uuid>
-        - define quantity   <util.random.int[1].to[16]> if:!<[quantity].exists>
-        - define profession <[entity].profession>       if:<[entity].profession.exists>
+        - define profession <[entity].profession> if:<[entity].profession.exists>
         - flag <[player]> komisi.<[uuid]>.entity:<[entity].entity_type>
         - if <[profession]> == armorer:
             - define target <list[iron_ore|gold_ore|coal_ore|diamond_ore].random>
