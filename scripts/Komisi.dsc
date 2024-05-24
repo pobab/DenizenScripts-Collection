@@ -61,7 +61,7 @@ Komisi_setTask:
         validate_value:
         - if !<[value].is_integer>:
             - narrate "<&4>value must integer" if:<player.has_permission[admin]>
-            - stop
+            - foreach next
     script:
     - foreach <[uuid]> as:id:
         - define profession <[player].proc[Komisi_getTask].context[<[id]>|profession]>
@@ -83,7 +83,8 @@ Komisi_setTask:
             - inject <script> path:subscript.validate_value
             - foreach next if:<[recent].is_more_than_or_equal_to[<[goal]>]>
             - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[recent].add[<[value]>]>
-            - narrate progress_<&e><[profession]>_<&b><[object]>_<&a><[value]>_<&c><[recent]>
+            - define recent <[player].proc[Komisi_getTask].context[<[id]>|recent]>
+            - narrate <&a>complete if:<[recent].is_more_than_or_equal_to[<[goal]>]>
         - else if <[value].contains_text[-]>:
             - define value <[value].after[-]>
             - inject <script> path:subscript.validate_value
