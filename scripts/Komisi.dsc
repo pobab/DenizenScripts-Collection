@@ -1,6 +1,7 @@
 Komisi_Listener:
     type: world
     events:
+        # todo: lengkapi tiap tugas untuk dijadikan komisi
         on player fishes entity:
         - stop if:<context.xp.is_less_than_or_equal_to[0]>
         - define object <context.item.material.name>
@@ -9,20 +10,24 @@ Komisi_Listener:
 
 Komisi_newTask:
     type: task
-    definitions: player|entity
+    definitions: player|entity|quantity
     script:
-    - define quantity   <util.random.int[1].to[16]>
-    - define profession <list[fisherman].random>
-    # - define profession <list[fisherman|butcher|shepherd].random>
-
     - define uuid <util.random_uuid>
     - if <[entity].exists>:
-        - define uuid <[entity].uuid>
-        - define profession <[entity].profession> if:<[entity].profession.exists>
+        - define uuid       <[entity].uuid>
+        - define quantity   <util.random.int[1].to[16]> if:!<[quantity].exists>
+        - define profession <[entity].profession>       if:<[entity].profession.exists>
         - flag <[player]> komisi.<[uuid]>.entity:<[entity].entity_type>
-
-    - if <[profession]> == fisherman:
-        - define target <list[cod|salmon|pufferfish|tropical_fish].random>
+        - if <[profession]> == armorer:
+            - define target <list[iron_ore|gold_ore|coal_ore|diamond_ore].random>
+        - else if <[profession]> == butcher:
+            - define target <list[chicken|rabbit|pig|sheep|cow].random>
+        - else if <[profession]> == cleric:
+            - define target <server.potion_effect_types>
+        - else if <[profession]> == farmer:
+            - define target <list[wheat|carrot|potato|beetroot|pumpkin|melon].random>
+        - else if <[profession]> == fisherman:
+            - define target <list[cod|salmon|pufferfish|tropical_fish].random>
 
     - flag <[player]> komisi.<[uuid]>.<[profession]>.<[target]>.recent:0
     - flag <[player]> komisi.<[uuid]>.<[profession]>.<[target]>.quantity:<[quantity]>
