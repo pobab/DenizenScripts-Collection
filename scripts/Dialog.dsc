@@ -20,18 +20,6 @@ Dialog_GUI:
     - determine <[result]>
 
 
-Dialog_Data:
-    type: data
-    debug: false
-    text:
-    - aku adalah kesatria hitam dan
-    - kesatria merah dan putih bekerja
-    - raja pobab karena istri mereka
-    - sang raja adalah penikmat tobrut
-    - aku sebagai kesatria hitam bangga
-    - karena guruku ialah fiqun master
-
-
 Dialog_Talk:
     type: task
     debug: false
@@ -53,3 +41,45 @@ Dialog_Talk:
     - define inventory <inventory[Dialog_GUI]>
     - adjust <[inventory]> title:<[inventory].title><&r><[result].unseparated>
     - inventory open d:<[inventory]>
+
+
+Dialog_Data:
+    type: data
+    debug: false
+    text:
+    - aku adalah kesatria hitam dan
+    - kesatria merah dan putih bekerja
+    - raja pobab karena istri mereka
+    - sang raja adalah penikmat tobrut
+    - aku sebagai kesatria hitam bangga
+    - karena guruku ialah fiqun master
+    talk:
+        farmer:
+            text:
+            - yay
+            button_1:
+                text: ok
+                direct: talk
+            button_2:
+                text: can
+                direct: komisi
+    rumor:
+        farmer:
+            text:
+            - yay
+            button_1:
+                text: ok
+                direct: talk
+            button_2:
+                text: can
+                direct: komisi
+    komisi:
+        farmer:
+            text:
+            - yay
+            button_1:
+                text: ok
+                direct: talk
+            button_2:
+                text: can
+                direct: komisi
