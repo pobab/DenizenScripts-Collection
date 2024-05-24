@@ -57,6 +57,11 @@ Komisi_getTask:
 Komisi_setTask:
     type: task
     definitions: player|uuid|object|value
+    subscript:
+        validate_value:
+        - if !<[value].is_integer>:
+            - narrate "<&4>value must integer" if:<player.has_permission[admin]>
+            - stop
     script:
     - foreach <[uuid]> as:id:
         - define profession <[player].proc[Komisi_getTask].context[<[id]>|profession]>
@@ -75,15 +80,19 @@ Komisi_setTask:
         - if <[value].contains_text[+]>:
             # todo: bikin fungsi ketika komisi completed
             - define value <[value].after[+]>
+            - inject <script> path:subscript.validate_value
             - foreach next if:<[recent].is_more_than_or_equal_to[<[goal]>]>
             - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[recent].add[<[value]>]>
             - narrate progress_<&e><[profession]>_<&b><[object]>_<&a><[value]>_<&c><[recent]>
         - else if <[value].contains_text[-]>:
             - define value <[value].after[-]>
+            - inject <script> path:subscript.validate_value
             - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[recent].sub[<[value]>]>
         - else if <[value].contains_text[=]>:
             - define value <[value].after[=]>
+            - inject <script> path:subscript.validate_value
             - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[value]>
         - else:
+            - inject <script> path:subscript.validate_value
             - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.quantity:<[value]>
 
