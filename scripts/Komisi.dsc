@@ -51,6 +51,7 @@ Komisi_uuidTask:
     - foreach <[task]>:
         - define uuid:->:<[value].split[.].first>
     - determine <[uuid].deduplicate> if:<[uuid].exists>
+    - determine <list>
 
 
 Komisi_getTask:
