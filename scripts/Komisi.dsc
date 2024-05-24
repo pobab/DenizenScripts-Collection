@@ -10,6 +10,31 @@ Komisi_Listener:
         - define object <context.entity.entity_type>
         - run Komisi_setTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[butcher]> def.object:<[object]> def.value:+1
 
+        on player breaks brewing_stand:
+        - flag <context.location> komisi:! if:<context.location.has_flag[komisi]>
+        on player clicks in brewing:
+        - stop if:<context.slot.is_less_than[1]>
+        - stop if:!<context.clicked_inventory.inventory_type.equals[brewing]>
+        - define inventory  <context.clicked_inventory>
+        - define location   <[inventory].location>
+        - stop if:<[location].has_flag[komisi.brewing.started]>
+        - flag <[location]> komisi.brewing.brews:<player>
+        on brewing starts:
+        - define location   <context.location>
+        - define inventory  <[location].inventory>
+        - define viewers    <[inventory].viewers>
+        - define player     <[location].flag[komisi.brewing.brews]> if:<[location].has_flag[komisi.brewing.brews]>
+        - define player     <[viewers].first> if:!<[viewers].is_empty>
+        - stop if:!<[player].exists>
+        - flag <[location]> komisi.brewing.started
+
+        on player breaks wheat|beetroos|carrots|potatoes|melon|pumpkin:
+        - stop if:!<context.material.age.exists>
+        - define material   <context.material>
+        - define object     <[material].name>
+        - stop if:<[material].age.is_less_than[<[material].maximum_age>].or[<[object].equals[melon].not>].or[<[object].equals[pumpkin].not>]>
+        - run Komisi_setTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[farmer]> def.object:<[object]> def.value:+1
+
         on player fishes entity:
         - stop if:<context.xp.is_less_than_or_equal_to[0]>
         - define object <context.item.material.name>
