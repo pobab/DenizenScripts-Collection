@@ -1,7 +1,6 @@
 Komisi_Listener:
     type: world
     events:
-        # todo: lengkapi tiap tugas untuk dijadikan komisi
         on player breaks *_ore:
         - define object <context.material.name>
         - run Komisi_setTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[armorer]> def.object:<[object]> def.value:+1
@@ -19,14 +18,27 @@ Komisi_Listener:
         - define location   <[inventory].location>
         - stop if:<[location].has_flag[komisi.brewing.started]>
         - flag <[location]> komisi.brewing.brews:<player>
-        on brewing starts:
+        after brewing starts:
         - define location   <context.location>
         - define inventory  <[location].inventory>
-        - define viewers    <[inventory].viewers>
         - define player     <[location].flag[komisi.brewing.brews]> if:<[location].has_flag[komisi.brewing.brews]>
-        - define player     <[viewers].first> if:!<[viewers].is_empty>
         - stop if:!<[player].exists>
         - flag <[location]> komisi.brewing.started
+        - while <[location].brewing_time.is_more_than[0]>:
+            - define time <[location].brewing_time>
+            - flag <[location]> komisi.brewing.finished if:<[time].is_less_than_or_equal_to[1]>
+            - wait 1s
+        - flag <[location]> komisi:! if:!<[location].has_flag[komisi.brewing.finished]>
+        on brewing stand brews:
+        - define location   <context.location>
+        - define inventory  <[location].inventory>
+        - define player     <[location].flag[komisi.brewing.brews]> if:<[location].has_flag[komisi.brewing.brews]>
+        - foreach <context.result> as:item:
+            - foreach next if:!<[item].effects_data.exists>
+            - define effect <[item].effects_data.first>
+            - define object <[effect].get[base_type]>
+            - run Komisi_setTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[cleric]> def.object:<[object]> def.value:+1
+        - flag <[location]> komisi:!
 
         on player breaks wheat|beetroos|carrots|potatoes|melon|pumpkin:
         - stop if:!<context.material.age.exists>
@@ -55,7 +67,7 @@ Komisi_newTask:
         - else if <[profession]> == butcher:
             - define target <list[chicken|rabbit|pig|sheep|cow].random>
         - else if <[profession]> == cleric:
-            - define target <server.potion_effect_types>
+            - define target <server.potion_types>
         - else if <[profession]> == farmer:
             - define target <list[wheat|carrot|potato|beetroot|pumpkin|melon].random>
         - else if <[profession]> == fisherman:
