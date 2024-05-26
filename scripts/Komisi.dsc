@@ -1,3 +1,14 @@
+Komisi_Command:
+    type: command
+    name: komisi
+    description: komisi
+    usage: /komisi
+    permission: dscript.komisi
+    script:
+    - foreach <player.proc[Komisi_uuidTask]> as:id:
+        - narrate "<[loop_index]>. <player.proc[Komisi_getTask].context[<[id]>|profession]>:"
+        - narrate "-<&gt> Object: <player.proc[Komisi_getTask].context[<[id]>|target]> <player.proc[Komisi_getTask].context[<[id]>|recent]>/<player.proc[Komisi_getTask].context[<[id]>|quantity]>"
+
 Komisi_Listener:
     type: world
     events:
