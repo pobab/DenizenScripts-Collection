@@ -69,6 +69,7 @@ Komisi_newTask:
     definitions: player|entity|quantity|profession
     script:
     - define uuid       <util.random_uuid>
+    - define player     <player> if:!<[player].exists>
     - define quantity   <util.random.int[1].to[16]> if:!<[quantity].exists>
     - define profession <list[armorer|butcher|cleric|farmer|fisherman].random> if:!<[profession].exists>
     - if <[entity].exists>:
