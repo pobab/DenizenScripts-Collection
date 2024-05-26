@@ -81,7 +81,7 @@ Komisi_newTask:
     - else if <[profession]> == butcher:
         - define target <list[chicken|rabbit|pig|sheep|cow].random>
     - else if <[profession]> == cleric:
-        - define target <server.potion_types>
+        - define target <server.potion_types.random>
     - else if <[profession]> == farmer:
         - define target <list[wheat|carrot|potato|beetroot|pumpkin|melon].random>
     - else if <[profession]> == fisherman:
