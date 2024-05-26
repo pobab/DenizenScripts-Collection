@@ -44,8 +44,8 @@ Dialog_Talk:
     - define data   <script[dialog_data].data_key[text]>
     - if <[entity].exists>:
         - define profession <[entity].profession>
-        - define world      <[entity].world>
-        - define direct     working                                                         if:<[world].time.is_more_than_or_equal_to[2000].and[<[world].time.is_less_than_or_equal_to[6000]>]>
+        - define clock      <[entity].world.time.proc[util_timeformat].context[24].split[:].first>
+        - define direct     working                                                         if:<[clock].is_more_than_or_equal_to[8].and[<[clock].is_less_than_or_equal_to[12]>]>
         - define direct     <[player].flag[dialog.temp.direct]>                             if:<[player].has_flag[dialog.temp.direct]>
         - define data       <script[dialog_data].data_key[<[direct]>.<[profession]>.text]>  if:<script[dialog_data].data_key[<[direct]>.<[profession]>.text].exists>
     - define result:->:<element[-173].proc[api_textoffset]>
