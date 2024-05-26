@@ -48,4 +48,4 @@ Util_TimeFormat:
     # If no format is given, output an error.
     - else:
         - debug error "<&[error]>No format given. Add 24 or 12 to the format argument."
-    - determine <&[emphasis]><[hour].pad_left[2].with[0]><element[:].custom_color[base]><[minute].pad_left[2].with[0]><[meridiem].custom_color[base]><[period].if_null[<empty>]>
+    - determine <[hour]><&co><[minute]>
