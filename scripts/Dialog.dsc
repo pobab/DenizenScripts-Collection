@@ -29,7 +29,7 @@ Dialog_GUI:
 Dialog_Talk:
     type: task
     debug: false
-    definitions: def
+    definitions: player|entity
     script:
     - define data <script[dialog_data].data_key[text]>
     - define result:->:<element[-173].proc[api_textoffset]>
