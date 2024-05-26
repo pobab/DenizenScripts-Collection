@@ -59,15 +59,17 @@ Dialog_Data:
     - sang raja adalah penikmat tobrut
     - aku sebagai kesatria hitam bangga
     - karena guruku ialah fiqun master
-    talk:
-        farmer:
+    working:
+        armorer:
             text:
-            - yay
+            - Hey, aku sedang sibuk bekerja
+            - tidak bisakah kamu berhenti
+            - mengganggu ku?
             button_1:
-                text: ok
-                direct: talk
+                text: Ummm, Yeah... baiklah
+                direct: close
             button_2:
-                text: can
+                text: Apakah ada yang bisa ku bantu?
                 direct: komisi
     rumor:
         farmer:
@@ -80,11 +82,12 @@ Dialog_Data:
                 text: can
                 direct: komisi
     komisi:
-        farmer:
+        armorer:
             text:
-            - yay
+            - Pergilah menambang %target% %object%
+            - jika kau memang ingin berguna!
             button_1:
-                text: ok
+                text: Baiklah...
                 direct: talk
             button_2:
                 text: can
