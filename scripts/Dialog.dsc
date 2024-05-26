@@ -18,6 +18,12 @@ Dialog_GUI:
         - define result:->:<item[air]>
 
     - determine <[result]>
+    listener:
+        on open:
+        - flag <player> dialog.inventories:<player.inventory.list_contents>
+        - inventory clear
+        on close:
+        - inventory set destination:<player.inventory> origin:<player.flag[dialog.inventories]> if:<player.has_flag[dialog.inventories]>
 
 
 Dialog_Talk:
