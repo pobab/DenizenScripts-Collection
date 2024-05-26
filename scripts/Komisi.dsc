@@ -44,6 +44,7 @@ Komisi_Listener:
         - define location   <context.location>
         - define inventory  <[location].inventory>
         - define player     <[location].flag[komisi.brewing.brews]> if:<[location].has_flag[komisi.brewing.brews]>
+        - stop if:!<[location].has_flag[komisi.brewing.finished]>
         - foreach <context.result> as:item:
             - foreach next if:!<[item].effects_data.exists>
             - define effect <[item].effects_data.first>
