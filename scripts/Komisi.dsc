@@ -48,7 +48,7 @@ Komisi_Listener:
             - foreach next if:!<[item].effects_data.exists>
             - define effect <[item].effects_data.first>
             - define object <[effect].get[base_type]>
-            - run Komisi_setTask def.player:<player> def.uuid:<player.proc[Komisi_uuidTask].context[cleric]> def.object:<[object]> def.value:+1
+            - run Komisi_setTask def.player:<[player]> def.uuid:<[player].proc[Komisi_uuidTask].context[cleric]> def.object:<[object]> def.value:+1
         - flag <[location]> komisi:!
 
         on player breaks wheat|beetroos|carrots|potatoes|melon|pumpkin:
