@@ -31,7 +31,14 @@ Dialog_Talk:
     debug: false
     definitions: player|entity
     script:
-    - define data <script[dialog_data].data_key[text]>
+    - define player <player> if:!<[player].exists>
+    - define data   <script[dialog_data].data_key[text]>
+    - if <[entity].exists>:
+        - define profession <[entity].profession>
+        - define world      <[entity].world>
+        - define direct     working                                                         if:<[world].time.is_more_than_or_equal_to[2000].and[<[world].time.is_less_than_or_equal_to[6000]>]>
+        - define direct     <[player].flag[dialog.temp.direct]>                             if:<[player].has_flag[dialog.temp.direct]>
+        - define data       <script[dialog_data].data_key[<[direct]>.<[profession]>.text]>  if:<script[dialog_data].data_key[<[direct]>.<[profession]>.text].exists>
     - define result:->:<element[-173].proc[api_textoffset]>
     - foreach <[data]>:
         - if <[loop_index]> > 1:
