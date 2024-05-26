@@ -26,6 +26,15 @@ Dialog_GUI:
         - inventory set destination:<player.inventory> origin:<player.flag[dialog.inventories]> if:<player.has_flag[dialog.inventories]>
 
 
+Dialog_Listener:
+    type: world
+    events:
+        on player right clicks villager:
+        - determine passively cancelled
+        - ratelimit <player> 1s
+        - run Dialog_Talk def.entity:<context.entity>
+
+
 Dialog_Talk:
     type: task
     debug: false
