@@ -48,7 +48,11 @@ Dialog_Talk:
         - define direct     working                                                         if:<[clock].is_more_than_or_equal_to[8].and[<[clock].is_less_than_or_equal_to[12]>]>
         - define direct     <[player].flag[dialog.temp.direct]>                             if:<[player].has_flag[dialog.temp.direct]>
         - define data       <script[dialog_data].data_key[<[direct]>.<[profession]>.text]>  if:<script[dialog_data].data_key[<[direct]>.<[profession]>.text].exists>
-    - define result:->:<element[-173].proc[api_textoffset]>
+    - define result:->:<element[-178].proc[api_textoffset]>
+    - define result:->:<&f><&chr[E005].font[dialog:gui]>
+    - define result:->:<element[-170].proc[api_textoffset]>
+    - define result:->:<&chr[E007].font[dialog:gui]>
+    - define result:->:<element[-165].proc[api_textoffset]><&r>
     - foreach <[data]>:
         - if <[loop_index]> > 1:
             - define text <[data].get[<[loop_index].sub[1]>]>
