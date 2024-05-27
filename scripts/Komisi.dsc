@@ -1,8 +1,9 @@
 Komisi_Command:
     type: command
     name: komisi
-    description: komisi
+    debug: false
     usage: /komisi
+    description: komisi
     permission: dscript.komisi
     script:
     - foreach <player.proc[Komisi_uuidTask]> as:id:
@@ -11,6 +12,7 @@ Komisi_Command:
 
 Komisi_Listener:
     type: world
+    debug: false
     events:
         on player breaks *_ore:
         - define object <context.material.name>
@@ -27,30 +29,25 @@ Komisi_Listener:
         - stop if:!<context.clicked_inventory.inventory_type.equals[brewing]>
         - define inventory  <context.clicked_inventory>
         - define location   <[inventory].location>
-        - stop if:<[location].has_flag[komisi.brewing.started]>
-        - flag <[location]> komisi.brewing.brews:<player>
+        - flag <[location]> komisi.brewing.brews:<player> if:!<[location].has_flag[komisi.brewing.started]>
         after brewing starts:
         - define location   <context.location>
         - define inventory  <[location].inventory>
         - define player     <[location].flag[komisi.brewing.brews]> if:<[location].has_flag[komisi.brewing.brews]>
         - stop if:!<[player].exists>
+        # flag komisi.brewing.started digunakan untuk mencegah perubahan player ketika menyeduh potion berlangsung
         - flag <[location]> komisi.brewing.started
-        - while <[location].brewing_time.is_more_than[0]>:
-            - define time <[location].brewing_time>
-            - flag <[location]> komisi.brewing.finished if:<[time].is_less_than_or_equal_to[1]>
-            - wait 1s
-        - flag <[location]> komisi:! if:!<[location].has_flag[komisi.brewing.finished]>
+        - waituntil rate:1s max:25s <[location].brewing_time.is_less_than_or_equal_to[0]>
+        - flag <[location]> komisi:!
         on brewing stand brews:
         - define location   <context.location>
         - define inventory  <[location].inventory>
         - define player     <[location].flag[komisi.brewing.brews]> if:<[location].has_flag[komisi.brewing.brews]>
-        - stop if:!<[location].has_flag[komisi.brewing.finished]>
+        - stop if:!<[player].exists>
         - foreach <context.result> as:item:
             - foreach next if:!<[item].effects_data.exists>
-            - define effect <[item].effects_data.first>
-            - define object <[effect].get[base_type]>
+            - define object <[item].effects_data.first.get[base_type]>
             - run Komisi_setTask def.player:<[player]> def.uuid:<[player].proc[Komisi_uuidTask].context[cleric]> def.object:<[object]> def.value:+1
-        - flag <[location]> komisi:!
 
         on player breaks wheat|beetroos|carrots|potatoes|melon|pumpkin:
         - stop if:!<context.material.age.exists>
@@ -111,7 +108,7 @@ Komisi_getTask:
     definitions: player|uuid|data
     script:
     - determine null if:!<[player].has_flag[komisi]>
-    - determine <[player].flag[komisi.<[uuid]>].keys.first>                         if:<[data].equals[profession]>
+    - determine <[player].flag[komisi.<[uuid]>].keys.exclude[entity].first>         if:<[data].equals[profession]>
     - define profession <[player].proc[<script.name>].context[<[uuid]>|profession]>
     - determine <[player].flag[komisi.<[uuid]>.<[profession]>].keys.first>          if:<[data].equals[target]>
     - define target     <[player].proc[<script.name>].context[<[uuid]>|target]>
@@ -149,7 +146,8 @@ Komisi_setTask:
             - foreach next if:<[recent].is_more_than_or_equal_to[<[goal]>]>
             - flag <[player]> komisi.<[id]>.<[profession]>.<[object]>.recent:<[recent].add[<[value]>]>
             - define recent <[player].proc[Komisi_getTask].context[<[id]>|recent]>
-            - narrate <&a>complete if:<[recent].is_more_than_or_equal_to[<[goal]>]>
+            - narrate <&a>+<[value]>    if:<[recent].is_less_than[<[goal]>]>                targets:<[player]>
+            - narrate <&2>complete      if:<[recent].is_more_than_or_equal_to[<[goal]>]>    targets:<[player]>
         - else if <[value].contains_text[-]>:
             - define value <[value].after[-]>
             - inject <script> path:subscript.validate_value
