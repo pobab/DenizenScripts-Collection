@@ -35,7 +35,7 @@ Komisi_Listener:
         - define inventory  <[location].inventory>
         - define player     <[location].flag[komisi.brewing.brews]> if:<[location].has_flag[komisi.brewing.brews]>
         - stop if:!<[player].exists>
-        # flag komisi.brewing.started digunakan untuk mencegah perubahan player ketika menyeduh potion berlangsung
+        # flag komisi.brewing.started digunakan untuk mencegah perubahan player saat menyeduh potion berlangsung
         - flag <[location]> komisi.brewing.started
         - waituntil rate:1s max:25s <[location].brewing_time.is_less_than_or_equal_to[0]>
         - flag <[location]> komisi:!
