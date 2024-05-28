@@ -45,10 +45,12 @@ Dialog_Talk:
     - if <[entity].exists>:
         - define profession <[entity].profession>
         - define clock      <[entity].world.time.proc[util_timeformat].context[24].split[:].first>
-        - define direct     working                                                         if:<[clock].is_more_than_or_equal_to[8].and[<[clock].is_less_than_or_equal_to[12]>]>
+        - define direct     work                                                            if:<[clock].is_more_than_or_equal_to[8].and[<[clock].is_less_than_or_equal_to[12]>]>
         - define direct     <[player].flag[dialog.temp.direct]>                             if:<[player].has_flag[dialog.temp.direct]>
         - define data       <script[dialog_data].data_key[<[direct]>.<[profession]>.text]>  if:<script[dialog_data].data_key[<[direct]>.<[profession]>.text].exists>
     - define result:->:<element[-178].proc[api_textoffset]>
+    # todo: menambahkan teks pada button
+    # todo: menambahkan fungsi button untuk mengarahkan ke dialog lainnya
     - define result:->:<&f><&chr[E005].font[dialog:gui]>
     - define result:->:<element[-170].proc[api_textoffset]>
     - define result:->:<&chr[E007].font[dialog:gui]>
@@ -79,7 +81,27 @@ Dialog_Data:
     - sang raja adalah penikmat tobrut
     - aku sebagai kesatria hitam bangga
     - karena guruku ialah fiqun master
-    working:
+    wander:
+        armorer:
+            text:
+            - wander
+            button_1:
+                text: wander
+                direct: close
+            button_2:
+                text: wander
+                direct: komisi
+    gather:
+        armorer:
+            text:
+            - gather
+            button_1:
+                text: gather1
+                direct: close
+            button_2:
+                text: gather2
+                direct: komisi
+    work:
         armorer:
             text:
             - Hey, aku sedang sibuk bekerja
