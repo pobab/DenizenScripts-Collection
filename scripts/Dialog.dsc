@@ -85,52 +85,57 @@ Dialog_Data:
         armorer:
             text:
             - wander
-            button_1:
-                text: wander
-                direct: close
-            button_2:
-                text: wander
-                direct: komisi
+            button:
+                1:
+                    text: wander
+                    direct: close
+                2:
+                    text: wander
+                    direct: komisi
     gather:
         armorer:
             text:
             - gather
-            button_1:
-                text: gather1
-                direct: close
-            button_2:
-                text: gather2
-                direct: komisi
+            button:
+                1:
+                    text: wander
+                    direct: close
+                2:
+                    text: wander
+                    direct: komisi
     work:
         armorer:
             text:
             - Hey, aku sedang sibuk bekerja
             - tidak bisakah kamu berhenti
             - mengganggu ku?
-            button_1:
-                text: Ummm, Yeah... baiklah
-                direct: close
-            button_2:
-                text: Apakah ada yang bisa ku bantu?
-                direct: komisi
+            button:
+                1:
+                    text: wander
+                    direct: close
+                2:
+                    text: wander
+                    direct: komisi
     rumor:
         farmer:
             text:
             - yay
-            button_1:
-                text: ok
-                direct: talk
-            button_2:
-                text: can
-                direct: komisi
+            button:
+                1:
+                    text: wander
+                    direct: close
+                2:
+                    text: wander
+                    direct: komisi
     komisi:
         armorer:
             text:
             - Pergilah menambang %target% %object%
             - jika kau memang ingin berguna!
-            button_1:
-                text: Baiklah...
-                direct: talk
-            button_2:
-                text: can
-                direct: komisi
+            button:
+                1:
+                    text: wander
+                    direct: close
+                2:
+                    text: wander
+                    direct: komisi
