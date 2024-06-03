@@ -47,15 +47,24 @@ Dialog_Talk:
         - define clock      <[entity].world.time.proc[util_timeformat].context[24].split[:].first>
         - define direct     work                                                            if:<[clock].is_more_than_or_equal_to[8].and[<[clock].is_less_than_or_equal_to[12]>]>
         - define direct     <[player].flag[dialog.temp.direct]>                             if:<[player].has_flag[dialog.temp.direct]>
-        - define data       <script[dialog_data].data_key[<[direct]>.<[profession]>.text]>  if:<script[dialog_data].data_key[<[direct]>.<[profession]>.text].exists>
-    - define result:->:<element[-178].proc[api_textoffset]>
+        - define data       <script[dialog_data].data_key[<[direct]>.<[profession]>]>       if:<script[dialog_data].data_key[<[direct]>.<[profession]>].exists>
+        - define button     <[data].get[button]>                                            if:<[data].get[button].exists>
+
     # todo: menambahkan teks pada button
     # todo: menambahkan fungsi button untuk mengarahkan ke dialog lainnya
-    - define result:->:<&f><&chr[E005].font[dialog:gui]>
+    # Button UI
+    - define result:->:<element[-178].proc[api_textoffset]><&f>
+    - define result:->:<&chr[E1BC].font[dialog:gui]>
     - define result:->:<element[-170].proc[api_textoffset]>
-    - define result:->:<&chr[E007].font[dialog:gui]>
+    - define result:->:<&chr[E2BC].font[dialog:gui]>
     - define result:->:<element[-165].proc[api_textoffset]><&r>
-    - foreach <[data]>:
+    - foreach <[button]>:
+        - define array <[button].keys.get[<[loop_index]>]>
+        - foreach stop if:<[array].is_more_than[2]>
+        - define result[<[array].mul[2]>]:<&f><&chr[E<[array]>BD].font[dialog:gui]>
+
+    # Text
+    - foreach <[data].get[text]>:
         - if <[loop_index]> > 1:
             - define text <[data].get[<[loop_index].sub[1]>]>
             # Text Offset to make the dialog text align to left
