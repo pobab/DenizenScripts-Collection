@@ -10,7 +10,8 @@ MobsBehaviour_VillagerSchedule:
     - determine work    if:<[clock].is_more_than_or_equal_to[8].and[<[clock].is_less_than[12]>]>
     - determine gather  if:<[clock].is_more_than_or_equal_to[15].and[<[clock].is_less_than[16]>]>
     - determine wander  if:<[clock].is_more_than_or_equal_to[16].and[<[clock].is_less_than[18]>]>
-    - determine sleep   if:<[clock].is_more_than_or_equal_to[18].and[<[clock].is_less_than[6]>]>
+    - determine sleep   if:<[clock].is_more_than_or_equal_to[18].and[<[clock].is_less_than[6]>]>\
+    - determine null
 
 
 
