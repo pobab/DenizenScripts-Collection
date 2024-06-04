@@ -5,13 +5,8 @@ Dialog_GUI:
     gui: true
     size: 9
     debug: false
-    title: <&f><script.parsed_key[ui_design].unseparated.split[;].parse_tag[<[parse_value].proc[Util_TextIdentifyInt].if_true[<[parse_value].proc[api_textoffset]>].if_false[<[parse_value]>]>].unseparated>
+    title: <script.name>
     inventory: chest
-    ui_design:
-    - ;-50;<&chr[e001].font[dialog:gui]>
-    - ;-239;<&chr[e009].font[dialog:gui]>
-    - ;-51;<&chr[e018].font[dialog:gui]>
-    - ;-8;<&chr[e004].font[dialog:gui]>
     procedural items:
     - define size <script.data_key[size]>
     - repeat <[size]>:
@@ -24,6 +19,36 @@ Dialog_GUI:
         - inventory clear
         on close:
         - inventory set destination:<player.inventory> origin:<player.flag[dialog.inventories]> if:<player.has_flag[dialog.inventories]>
+
+
+Dialog_UI:
+    type: procedure
+    definitions: def
+    script:
+    - define result:->:<&f><element[-50].proc[api_textoffset]>
+    - define result:->:<&chr[e001].font[dialog:gui]>
+    - define result:->:<element[-239].proc[api_textoffset]>
+    - define result:->:<&chr[e009].font[dialog:gui]>
+    - define result:->:<element[-51].proc[api_textoffset]>
+    - define result:->:<&chr[e018].font[dialog:gui]>
+    - define result:->:<element[-8].proc[api_textoffset]>
+    - define result:->:<&chr[e004].font[dialog:gui]><&r>
+    - determine <[result].unseparated>
+
+Dialog_ButtonUI:
+    type: procedure
+    definitions: button
+    script:
+    - define result:->:<element[-178].proc[api_textoffset]><&f>
+    - define result:->:<&chr[E1BC].font[dialog:gui]>
+    - define result:->:<element[-170].proc[api_textoffset]>
+    - define result:->:<&chr[E2BC].font[dialog:gui]>
+    - define result:->:<element[-165].proc[api_textoffset]><&r>
+    - determine <[result].unseparated> if:!<[button].is_truthy>
+    - foreach <[button]>:
+        - define array <[button].keys.get[<[loop_index]>]>
+        - define result[<[array].mul[2]>]:<&f><&chr[E<[array]>BD].font[dialog:gui]>
+    - determine <[result].unseparated>
 
 
 Dialog_Listener:
@@ -48,35 +73,10 @@ Dialog_Talk:
         - define direct     work                                                            if:<[clock].is_more_than_or_equal_to[8].and[<[clock].is_less_than_or_equal_to[12]>]>
         - define direct     <[player].flag[dialog.temp.direct]>                             if:<[player].has_flag[dialog.temp.direct]>
         - define data       <script[dialog_data].data_key[<[direct]>.<[profession]>]>       if:<script[dialog_data].data_key[<[direct]>.<[profession]>].exists>
-        - define button     <[data].get[button]>                                            if:<[data].get[button].exists>
+        - define button     <[data].get[button]||null>
 
-    # todo: menambahkan teks pada button
-    # todo: menambahkan fungsi button untuk mengarahkan ke dialog lainnya
-    # Button UI
-    - define result:->:<element[-178].proc[api_textoffset]><&f>
-    - define result:->:<&chr[E1BC].font[dialog:gui]>
-    - define result:->:<element[-170].proc[api_textoffset]>
-    - define result:->:<&chr[E2BC].font[dialog:gui]>
-    - define result:->:<element[-165].proc[api_textoffset]><&r>
-    - foreach <[button]>:
-        - define array <[button].keys.get[<[loop_index]>]>
-        - foreach stop if:<[array].is_more_than[2]>
-        - define result[<[array].mul[2]>]:<&f><&chr[E<[array]>BD].font[dialog:gui]>
-
-    # Text
-    - foreach <[data].get[text]>:
-        - if <[loop_index]> > 1:
-            - define text <[data].get[<[loop_index].sub[1]>]>
-            # Text Offset to make the dialog text align to left
-            - if <[text].contains_text[<&sp>]>:
-                - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
-                # count text width of space text
-                - define result:->:<element[<[text]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
-            - else:
-                - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
-        - define result:->:<[value].font[dialog:text/row<[loop_index]>]>
     - define inventory <inventory[Dialog_GUI]>
-    - adjust <[inventory]> title:<[inventory].title><&r><[result].unseparated>
+    - adjust <[inventory]> title:<proc[Dialog_UI]><&r><[button].proc[dialog_buttonui]>
     - inventory open d:<[inventory]>
 
 
