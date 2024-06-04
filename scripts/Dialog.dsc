@@ -23,7 +23,7 @@ Dialog_GUI:
 
 Dialog_UI:
     type: procedure
-    definitions: def
+    definitions: entity
     script:
     - define result:->:<&f><element[-50].proc[api_textoffset]>
     - define result:->:<&chr[e001].font[dialog:gui]>
@@ -37,18 +37,44 @@ Dialog_UI:
 
 Dialog_ButtonUI:
     type: procedure
-    definitions: button
+    definitions: entity
     script:
     - define result:->:<element[-178].proc[api_textoffset]><&f>
     - define result:->:<&chr[E1BC].font[dialog:gui]>
     - define result:->:<element[-170].proc[api_textoffset]>
     - define result:->:<&chr[E2BC].font[dialog:gui]>
     - define result:->:<element[-165].proc[api_textoffset]><&r>
-    - determine <[result].unseparated> if:!<[button].is_truthy>
-    - foreach <[button]>:
-        - define array <[button].keys.get[<[loop_index]>]>
+    - define dialog     <[entity].proc[MobsBehaviour_VillagerSchedule]>
+    - define profession <[entity].profession>
+    - define button_ui  <script[dialog_data].data_key[<[dialog]>.<[profession]>.button]||null>
+    - determine <[result].unseparated> if:!<[button_ui].is_truthy>
+    - foreach <[button_ui]>:
+        - define array <[button_ui].keys.get[<[loop_index]>]>
         - define result[<[array].mul[2]>]:<&f><&chr[E<[array]>BD].font[dialog:gui]>
     - determine <[result].unseparated>
+
+Dialog_TextUI:
+    type: procedure
+    definitions: entity
+    script:
+    - if <[entity].entity_type> == villager:
+        - define dialog         <[entity].proc[MobsBehaviour_VillagerSchedule]>
+        - define profession     <[entity].profession>
+        - define dialog_text    <script[dialog_data].data_key[<[dialog]>.<[profession]>.text]||null>
+        - define dialog_text    <script[dialog_data].data_key[text]> if:!<[dialog_text].is_truthy>
+        - foreach <[dialog_text]>:
+            - if <[loop_index]> > 1:
+                - define text <[dialog_text].get[<[loop_index].sub[1]>]>
+                # Text Offset to make the dialog text align to left
+                - if <[text].contains_text[<&sp>]>:
+                    - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
+                    # count text width of space text
+                    - define result:->:<element[<[text]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
+                - else:
+                    - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
+            - define result:->:<[value].font[dialog:text/row<[loop_index]>]>
+        - determine <[result].unseparated>
+    - determine null
 
 
 Dialog_Listener:
@@ -66,17 +92,8 @@ Dialog_Talk:
     definitions: player|entity
     script:
     - define player <player> if:!<[player].exists>
-    - define data   <script[dialog_data].data_key[text]>
-    - if <[entity].exists>:
-        - define profession <[entity].profession>
-        - define clock      <[entity].world.time.proc[util_timeformat].context[24].split[:].first>
-        - define direct     work                                                            if:<[clock].is_more_than_or_equal_to[8].and[<[clock].is_less_than_or_equal_to[12]>]>
-        - define direct     <[player].flag[dialog.temp.direct]>                             if:<[player].has_flag[dialog.temp.direct]>
-        - define data       <script[dialog_data].data_key[<[direct]>.<[profession]>]>       if:<script[dialog_data].data_key[<[direct]>.<[profession]>].exists>
-        - define button     <[data].get[button]||null>
-
     - define inventory <inventory[Dialog_GUI]>
-    - adjust <[inventory]> title:<proc[Dialog_UI]><&r><[button].proc[dialog_buttonui]>
+    - adjust <[inventory]> title:<proc[Dialog_UI]><[entity].proc[dialog_buttonui]><[entity].proc[dialog_textui]>
     - inventory open d:<[inventory]>
 
 
