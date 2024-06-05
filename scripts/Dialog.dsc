@@ -19,10 +19,17 @@ Dialog_GUI:
         - inventory clear
         on close:
         - inventory set destination:<player.inventory> origin:<player.flag[dialog.inventories]> if:<player.has_flag[dialog.inventories]>
+        on click:
+        - define slot <context.slot>
+        - if <[slot]> >= 30 && <[slot]> <= 36:
+            - narrate 1
+        - if <[slot]> >= 3 && <[slot]> <= 9:
+            - narrate 2
 
 
 Dialog_UI:
     type: procedure
+    debug: false
     definitions: entity
     script:
     - define result:->:<&f><element[-50].proc[api_textoffset]>
@@ -37,13 +44,13 @@ Dialog_UI:
 
 Dialog_ButtonUI:
     type: procedure
+    debug: false
     definitions: entity
     script:
     - define result:->:<element[-178].proc[api_textoffset]><&f>
     - define result:->:<&chr[E1BC].font[dialog:gui]>
     - define result:->:<element[-170].proc[api_textoffset]>
     - define result:->:<&chr[E2BC].font[dialog:gui]>
-    - define result:->:<element[-165].proc[api_textoffset]><&r>
     - define dialog     <[entity].proc[MobsBehaviour_VillagerSchedule]>
     - define profession <[entity].profession>
     - define button_ui  <script[dialog_data].data_key[<[dialog]>.<[profession]>.button]||null>
@@ -55,15 +62,20 @@ Dialog_ButtonUI:
 
 Dialog_TextUI:
     type: procedure
+    debug: false
     definitions: entity
     script:
+    - define result:->:<element[-165].proc[api_textoffset]><&r>
     - if <[entity].entity_type> == villager:
         - define dialog         <[entity].proc[MobsBehaviour_VillagerSchedule]>
         - define profession     <[entity].profession>
+        # Text Dialog
         - define dialog_text    <script[dialog_data].data_key[<[dialog]>.<[profession]>.text]||null>
         - define dialog_text    <script[dialog_data].data_key[text]> if:!<[dialog_text].is_truthy>
+        # todo: make procedure script to aligned text
         - foreach <[dialog_text]>:
             - if <[loop_index]> > 1:
+                # get previous text for aligned second text to first text
                 - define text <[dialog_text].get[<[loop_index].sub[1]>]>
                 # Text Offset to make the dialog text align to left
                 - if <[text].contains_text[<&sp>]>:
@@ -73,8 +85,42 @@ Dialog_TextUI:
                 - else:
                     - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
             - define result:->:<[value].font[dialog:text/row<[loop_index]>]>
+            - if <[loop_index]> == <[dialog_text].size>:
+                - if <[value].contains_text[<&sp>]>:
+                    - define result:->:<element[-<[value].text_width>].proc[api_textoffset]>
+                    # count text width of space text
+                    - define result:->:<element[<[value]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
+                - else:
+                    - define result:->:<element[-<[value].text_width>].proc[api_textoffset]>
+        # Text Button
+        - define result:->:<element[5].proc[api_textoffset]>
+        - define button_text <script[dialog_data].data_key[<[dialog]>.<[profession]>.button]||null>
+        - determine <[result].unseparated> if:!<[button_text].is_truthy>
+        - foreach <[button_text]>:
+            - define text <[value].get[text]>
+            - if <[loop_index]> > 1:
+                - define align <[dialog_text].get[<[loop_index].sub[1]>]>
+                - if <[align].contains_text[<&sp>]>:
+                    - define result:->:<element[-<[align].text_width>].proc[api_textoffset]>
+                    # count text width of space text
+                    - define result:->:<element[<[align]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
+                - else:
+                    - define result:->:<element[-<[align].text_width>].proc[api_textoffset]>
+            - define result:->:<[text].font[dialog:text/button_<[loop_index]>]>
         - determine <[result].unseparated>
     - determine null
+
+Dialog_TextOffset:
+    type: procedure
+    definitions: text
+    script:
+    - if <[text].contains_text[<&sp>]>:
+        - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
+        # count text width of space text
+        - define result:->:<element[<[text]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
+    - else:
+        - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
+    - determine <[result]||null>
 
 
 Dialog_Listener:
@@ -137,10 +183,10 @@ Dialog_Data:
             - mengganggu ku?
             button:
                 1:
-                    text: wander
+                    text: Apakah ada yang bisa ku bantu?
                     direct: close
                 2:
-                    text: wander
+                    text: Baiklah...
                     direct: komisi
     rumor:
         farmer:
