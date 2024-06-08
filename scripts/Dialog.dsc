@@ -69,7 +69,6 @@ Dialog_TextUI:
     - if <[entity].entity_type> == villager:
         - define dialog         <[entity].proc[MobsBehaviour_VillagerSchedule]>
         - define profession     <[entity].profession>
-        # Text Dialog
         - define dialog_text    <script[dialog_data].data_key[<[dialog]>.<[profession]>.text]||null>
         - define dialog_text    <script[dialog_data].data_key[text]> if:!<[dialog_text].is_truthy>
         # todo: make procedure script to aligned text
@@ -92,22 +91,31 @@ Dialog_TextUI:
                     - define result:->:<element[<[value]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
                 - else:
                     - define result:->:<element[-<[value].text_width>].proc[api_textoffset]>
-        # Text Button
-        - define result:->:<element[5].proc[api_textoffset]>
-        - define button_text <script[dialog_data].data_key[<[dialog]>.<[profession]>.button]||null>
-        - determine <[result].unseparated> if:!<[button_text].is_truthy>
-        - foreach <[button_text]>:
-            - define text <[value].get[text]>
-            - if <[loop_index]> > 1:
-                - define align <[dialog_text].get[<[loop_index].sub[1]>]>
-                - if <[align].contains_text[<&sp>]>:
-                    - define result:->:<element[-<[align].text_width>].proc[api_textoffset]>
-                    # count text width of space text
-                    - define result:->:<element[<[align]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
-                - else:
-                    - define result:->:<element[-<[align].text_width>].proc[api_textoffset]>
-            - define result:->:<[text].font[dialog:text/button_<[loop_index]>]>
         - determine <[result].unseparated>
+    - determine null
+
+Dialog_ButtonTextUI:
+    type: procedure
+    debug: false
+    definitions: entity
+    script:
+    # Text Button
+    - define result:->:<element[5].proc[api_textoffset]>
+    - define dialog     <[entity].proc[MobsBehaviour_VillagerSchedule]>
+    - define profession <[entity].profession>
+    - define button_text <script[dialog_data].data_key[<[dialog]>.<[profession]>.button]||null>
+    - determine <[result].unseparated> if:!<[button_text].is_truthy>
+    - foreach <[button_text]>:
+        - define text <[value].get[text]>
+        - if <[loop_index]> > 1:
+            - define align <[button_text].deep_get[<[loop_index].sub[1]>.text]>
+            - if <[align].contains_text[<&sp>]>:
+                - define result:->:<element[-<[align].text_width>].proc[api_textoffset]>
+                # count text width of space text
+                - define result:->:<element[<[align]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
+            - else:
+                - define result:->:<element[-<[align].text_width>].proc[api_textoffset]>
+        - define result:->:<[text].font[dialog:text/button_<[loop_index]>]>
     - determine null
 
 Dialog_TextOffset:
@@ -139,7 +147,7 @@ Dialog_Talk:
     script:
     - define player <player> if:!<[player].exists>
     - define inventory <inventory[Dialog_GUI]>
-    - adjust <[inventory]> title:<proc[Dialog_UI]><[entity].proc[dialog_buttonui]><[entity].proc[dialog_textui]>
+    - adjust <[inventory]> title:<proc[Dialog_UI]><[entity].proc[dialog_buttonui]><[entity].proc[dialog_textui]><[entity].proc[dialog_buttontextui]>
     - inventory open d:<[inventory]>
 
 
