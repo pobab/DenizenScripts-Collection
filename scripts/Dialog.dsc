@@ -22,7 +22,9 @@ Dialog_GUI:
         on click:
         - define slot <context.slot>
         - if <[slot]> >= 30 && <[slot]> <= 36:
-            - narrate 1
+            - define entity     <player.flag[dialog.entity]>
+            - define schedule   <[entity].proc[MobsBehaviour_VillagerSchedule]>
+            - run Komisi_newTask def.player:<player> def.entity:<[entity]>
         - if <[slot]> >= 3 && <[slot]> <= 9:
             - narrate 2
 
@@ -76,21 +78,10 @@ Dialog_TextUI:
             - if <[loop_index]> > 1:
                 # get previous text for aligned second text to first text
                 - define text <[dialog_text].get[<[loop_index].sub[1]>]>
-                # Text Offset to make the dialog text align to left
-                - if <[text].contains_text[<&sp>]>:
-                    - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
-                    # count text width of space text
-                    - define result:->:<element[<[text]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
-                - else:
-                    - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
+                - define result:->:<[text].proc[Dialog_TextOffset]>
             - define result:->:<[value].font[dialog:text/row<[loop_index]>]>
             - if <[loop_index]> == <[dialog_text].size>:
-                - if <[value].contains_text[<&sp>]>:
-                    - define result:->:<element[-<[value].text_width>].proc[api_textoffset]>
-                    # count text width of space text
-                    - define result:->:<element[<[value]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
-                - else:
-                    - define result:->:<element[-<[value].text_width>].proc[api_textoffset]>
+                - define result:->:<[value].proc[Dialog_TextOffset]>
         - determine <[result].unseparated>
     - determine null
 
@@ -99,7 +90,6 @@ Dialog_ButtonTextUI:
     debug: false
     definitions: entity
     script:
-    # Text Button
     - define result:->:<element[5].proc[api_textoffset]>
     - define dialog     <[entity].proc[MobsBehaviour_VillagerSchedule]>
     - define profession <[entity].profession>
@@ -109,17 +99,13 @@ Dialog_ButtonTextUI:
         - define text <[value].get[text]>
         - if <[loop_index]> > 1:
             - define align <[button_text].deep_get[<[loop_index].sub[1]>.text]>
-            - if <[align].contains_text[<&sp>]>:
-                - define result:->:<element[-<[align].text_width>].proc[api_textoffset]>
-                # count text width of space text
-                - define result:->:<element[<[align]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
-            - else:
-                - define result:->:<element[-<[align].text_width>].proc[api_textoffset]>
+            - define result:->:<[align].proc[Dialog_TextOffset]>
         - define result:->:<[text].font[dialog:text/button_<[loop_index]>]>
-    - determine null
+    - determine <[result].unseparated||null>
 
 Dialog_TextOffset:
     type: procedure
+    debug: false
     definitions: text
     script:
     - if <[text].contains_text[<&sp>]>:
@@ -128,7 +114,7 @@ Dialog_TextOffset:
         - define result:->:<element[<[text]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
     - else:
         - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
-    - determine <[result]||null>
+    - determine <[result].unseparated||null>
 
 
 Dialog_Listener:
@@ -147,6 +133,7 @@ Dialog_Talk:
     script:
     - define player <player> if:!<[player].exists>
     - define inventory <inventory[Dialog_GUI]>
+    - flag <[player]> dialog.talk:<[entity]>
     - adjust <[inventory]> title:<proc[Dialog_UI]><[entity].proc[dialog_buttonui]><[entity].proc[dialog_textui]><[entity].proc[dialog_buttontextui]>
     - inventory open d:<[inventory]>
 
@@ -192,21 +179,10 @@ Dialog_Data:
             button:
                 1:
                     text: Apakah ada yang bisa ku bantu?
-                    direct: close
+                    direct: komisi
                 2:
                     text: Baiklah...
-                    direct: komisi
-    rumor:
-        farmer:
-            text:
-            - yay
-            button:
-                1:
-                    text: wander
                     direct: close
-                2:
-                    text: wander
-                    direct: komisi
     komisi:
         armorer:
             text:
@@ -214,8 +190,19 @@ Dialog_Data:
             - jika kau memang ingin berguna!
             button:
                 1:
-                    text: wander
-                    direct: close
+                    text: Baiklah, akan aku kerjakan
+                    direct: accept
                 2:
-                    text: wander
+                    text: Tidak ada kah tugas yang lebih baik
+                    direct: tawar
+    working:
+        armorer:
+            text:
+            - Sudahkah kamu menambang %target% %object%
+            button:
+                1:
+                    text: Sudah
                     direct: komisi
+                2:
+                    text: Bisakah jumlahnya dikurangkan?
+                    direct: close
