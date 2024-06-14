@@ -5,13 +5,8 @@ Dialog_GUI:
     gui: true
     size: 9
     debug: false
-    title: <&f><script.parsed_key[ui_design].unseparated.split[;].parse_tag[<[parse_value].proc[Util_TextIdentifyInt].if_true[<[parse_value].proc[api_textoffset]>].if_false[<[parse_value]>]>].unseparated>
+    title: <script.name>
     inventory: chest
-    ui_design:
-    - ;-50;<&chr[e001].font[dialog:gui]>
-    - ;-239;<&chr[e009].font[dialog:gui]>
-    - ;-51;<&chr[e018].font[dialog:gui]>
-    - ;-8;<&chr[e004].font[dialog:gui]>
     procedural items:
     - define size <script.data_key[size]>
     - repeat <[size]>:
@@ -24,6 +19,102 @@ Dialog_GUI:
         - inventory clear
         on close:
         - inventory set destination:<player.inventory> origin:<player.flag[dialog.inventories]> if:<player.has_flag[dialog.inventories]>
+        on click:
+        - define slot <context.slot>
+        - if <[slot]> >= 30 && <[slot]> <= 36:
+            - define entity     <player.flag[dialog.entity]>
+            - define schedule   <[entity].proc[MobsBehaviour_VillagerSchedule]>
+            - run Komisi_newTask def.player:<player> def.entity:<[entity]>
+        - if <[slot]> >= 3 && <[slot]> <= 9:
+            - narrate 2
+
+
+Dialog_UI:
+    type: procedure
+    debug: false
+    definitions: entity
+    script:
+    - define result:->:<&f><element[-50].proc[api_textoffset]>
+    - define result:->:<&chr[e001].font[dialog:gui]>
+    - define result:->:<element[-239].proc[api_textoffset]>
+    - define result:->:<&chr[e009].font[dialog:gui]>
+    - define result:->:<element[-51].proc[api_textoffset]>
+    - define result:->:<&chr[e018].font[dialog:gui]>
+    - define result:->:<element[-8].proc[api_textoffset]>
+    - define result:->:<&chr[e004].font[dialog:gui]><&r>
+    - determine <[result].unseparated>
+
+Dialog_ButtonUI:
+    type: procedure
+    debug: false
+    definitions: entity
+    script:
+    - define result:->:<element[-178].proc[api_textoffset]><&f>
+    - define result:->:<&chr[E1BC].font[dialog:gui]>
+    - define result:->:<element[-170].proc[api_textoffset]>
+    - define result:->:<&chr[E2BC].font[dialog:gui]>
+    - define dialog     <[entity].proc[MobsBehaviour_VillagerSchedule]>
+    - define profession <[entity].profession>
+    - define button_ui  <script[dialog_data].data_key[<[dialog]>.<[profession]>.button]||null>
+    - determine <[result].unseparated> if:!<[button_ui].is_truthy>
+    - foreach <[button_ui]>:
+        - define array <[button_ui].keys.get[<[loop_index]>]>
+        - define result[<[array].mul[2]>]:<&f><&chr[E<[array]>BD].font[dialog:gui]>
+    - determine <[result].unseparated>
+
+Dialog_TextUI:
+    type: procedure
+    debug: false
+    definitions: entity
+    script:
+    - define result:->:<element[-165].proc[api_textoffset]><&r>
+    - if <[entity].entity_type> == villager:
+        - define dialog         <[entity].proc[MobsBehaviour_VillagerSchedule]>
+        - define profession     <[entity].profession>
+        - define dialog_text    <script[dialog_data].data_key[<[dialog]>.<[profession]>.text]||null>
+        - define dialog_text    <script[dialog_data].data_key[text]> if:!<[dialog_text].is_truthy>
+        # todo: make procedure script to aligned text
+        - foreach <[dialog_text]>:
+            - if <[loop_index]> > 1:
+                # get previous text for aligned second text to first text
+                - define text <[dialog_text].get[<[loop_index].sub[1]>]>
+                - define result:->:<[text].proc[Dialog_TextOffset]>
+            - define result:->:<[value].font[dialog:text/row<[loop_index]>]>
+            - if <[loop_index]> == <[dialog_text].size>:
+                - define result:->:<[value].proc[Dialog_TextOffset]>
+        - determine <[result].unseparated>
+    - determine null
+
+Dialog_ButtonTextUI:
+    type: procedure
+    debug: false
+    definitions: entity
+    script:
+    - define result:->:<element[5].proc[api_textoffset]>
+    - define dialog     <[entity].proc[MobsBehaviour_VillagerSchedule]>
+    - define profession <[entity].profession>
+    - define button_text <script[dialog_data].data_key[<[dialog]>.<[profession]>.button]||null>
+    - determine <[result].unseparated> if:!<[button_text].is_truthy>
+    - foreach <[button_text]>:
+        - define text <[value].get[text]>
+        - if <[loop_index]> > 1:
+            - define align <[button_text].deep_get[<[loop_index].sub[1]>.text]>
+            - define result:->:<[align].proc[Dialog_TextOffset]>
+        - define result:->:<[text].font[dialog:text/button_<[loop_index]>]>
+    - determine <[result].unseparated||null>
+
+Dialog_TextOffset:
+    type: procedure
+    debug: false
+    definitions: text
+    script:
+    - if <[text].contains_text[<&sp>]>:
+        - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
+        # count text width of space text
+        - define result:->:<element[<[text]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
+    - else:
+        - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
+    - determine <[result].unseparated||null>
 
 
 Dialog_Listener:
@@ -41,33 +132,9 @@ Dialog_Talk:
     definitions: player|entity
     script:
     - define player <player> if:!<[player].exists>
-    - define data   <script[dialog_data].data_key[text]>
-    - if <[entity].exists>:
-        - define profession <[entity].profession>
-        - define clock      <[entity].world.time.proc[util_timeformat].context[24].split[:].first>
-        - define direct     work                                                            if:<[clock].is_more_than_or_equal_to[8].and[<[clock].is_less_than_or_equal_to[12]>]>
-        - define direct     <[player].flag[dialog.temp.direct]>                             if:<[player].has_flag[dialog.temp.direct]>
-        - define data       <script[dialog_data].data_key[<[direct]>.<[profession]>.text]>  if:<script[dialog_data].data_key[<[direct]>.<[profession]>.text].exists>
-    - define result:->:<element[-178].proc[api_textoffset]>
-    # todo: menambahkan teks pada button
-    # todo: menambahkan fungsi button untuk mengarahkan ke dialog lainnya
-    - define result:->:<&f><&chr[E005].font[dialog:gui]>
-    - define result:->:<element[-170].proc[api_textoffset]>
-    - define result:->:<&chr[E007].font[dialog:gui]>
-    - define result:->:<element[-165].proc[api_textoffset]><&r>
-    - foreach <[data]>:
-        - if <[loop_index]> > 1:
-            - define text <[data].get[<[loop_index].sub[1]>]>
-            # Text Offset to make the dialog text align to left
-            - if <[text].contains_text[<&sp>]>:
-                - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
-                # count text width of space text
-                - define result:->:<element[<[text]>].split[<&sp>].size.sub[1].mul[2].proc[api_textoffset]>
-            - else:
-                - define result:->:<element[-<[text].text_width>].proc[api_textoffset]>
-        - define result:->:<[value].font[dialog:text/row<[loop_index]>]>
     - define inventory <inventory[Dialog_GUI]>
-    - adjust <[inventory]> title:<[inventory].title><&r><[result].unseparated>
+    - flag <[player]> dialog.talk:<[entity]>
+    - adjust <[inventory]> title:<proc[Dialog_UI]><[entity].proc[dialog_buttonui]><[entity].proc[dialog_textui]><[entity].proc[dialog_buttontextui]>
     - inventory open d:<[inventory]>
 
 
@@ -111,22 +178,11 @@ Dialog_Data:
             - mengganggu ku?
             button:
                 1:
-                    text: wander
-                    direct: close
-                2:
-                    text: wander
+                    text: Apakah ada yang bisa ku bantu?
                     direct: komisi
-    rumor:
-        farmer:
-            text:
-            - yay
-            button:
-                1:
-                    text: wander
-                    direct: close
                 2:
-                    text: wander
-                    direct: komisi
+                    text: Baiklah...
+                    direct: close
     komisi:
         armorer:
             text:
@@ -134,8 +190,19 @@ Dialog_Data:
             - jika kau memang ingin berguna!
             button:
                 1:
-                    text: wander
-                    direct: close
+                    text: Baiklah, akan aku kerjakan
+                    direct: accept
                 2:
-                    text: wander
+                    text: Tidak ada kah tugas yang lebih baik
+                    direct: tawar
+    working:
+        armorer:
+            text:
+            - Sudahkah kamu menambang %target% %object%
+            button:
+                1:
+                    text: Sudah
                     direct: komisi
+                2:
+                    text: Bisakah jumlahnya dikurangkan?
+                    direct: close

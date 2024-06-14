@@ -1,3 +1,20 @@
+MobsBehaviour_VillagerSchedule:
+    type: procedure
+    definitions: entity
+    script:
+    - determine null if:!<[entity].exists>
+    - determine null if:!<[entity].entity_type.equals[villager]>
+    - define time   <[entity].world.time>
+    - define clock  <[time].proc[util_timeformat].context[24].split[:].first>
+    - determine wander  if:<[clock].is_more_than_or_equal_to[6].and[<[clock].is_less_than[8]>]>
+    - determine work    if:<[clock].is_more_than_or_equal_to[8].and[<[clock].is_less_than[12]>]>
+    - determine gather  if:<[clock].is_more_than_or_equal_to[15].and[<[clock].is_less_than[16]>]>
+    - determine wander  if:<[clock].is_more_than_or_equal_to[16].and[<[clock].is_less_than[18]>]>
+    - determine sleep   if:<[clock].is_more_than_or_equal_to[18].and[<[clock].is_less_than[6]>]>
+    - determine null
+
+
+
 MobsBehaviour_Listener:
     type: world
     debug: false
