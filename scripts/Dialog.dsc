@@ -132,8 +132,11 @@ Dialog_Talk:
     definitions: player|entity
     script:
     - define player <player> if:!<[player].exists>
-    - define inventory <inventory[Dialog_GUI]>
-    - flag <[player]> dialog.talk:<[entity]>
+    - define dialog     <[entity].proc[MobsBehaviour_VillagerSchedule]>
+    - define profession <[entity].profession>
+    - define inventory  <inventory[Dialog_GUI]>
+    - flag <[player]> dialog.entity:<[entity]>
+    - flag <[player]> dialog.talk:<[dialog]>.<[profession]>
     - adjust <[inventory]> title:<proc[Dialog_UI]><[entity].proc[dialog_buttonui]><[entity].proc[dialog_textui]><[entity].proc[dialog_buttontextui]>
     - inventory open d:<[inventory]>
 
