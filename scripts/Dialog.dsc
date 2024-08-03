@@ -28,12 +28,6 @@ Dialog_GUI:
         - define profession <[entity].profession>
         - if <[slot]> >= 30 && <[slot]> <= 36:
             - define section 1
-            # todo: flag ke entity untuk melanjutkan dialog
-            - if <player.has_flag[komisi.<[entity].uuid>]>:
-                - narrate yay
-            - else if <[dialog]> == work:
-                - run Komisi_newTask def.player:<player> def.entity:<[entity]>
-                # todo: get direct key button from dialog_data
         - if <[slot]> >= 3 && <[slot]> <= 9:
             - define section 2
         - stop if:!<[section].is_truthy>
@@ -100,13 +94,23 @@ Dialog_TextUI:
         - foreach <[dialog_text]>:
             - if <[loop_index]> > 1:
                 # get previous text for aligned second text to first text
-                - define text <[dialog_text].get[<[loop_index].sub[1]>].replace[%target%].with[<[komisi_quantity]>].replace[%object%].with[<[komisi_object]>].replace[_].with[<&sp>]>
+                - define text <[dialog_text].get[<[loop_index].sub[1]>].proc[dialog_textreplacedwith].context[<[entity]>]>
                 - define result:->:<[text].proc[Dialog_TextOffset]>
-            - define result:->:<[value].replace[%target%].with[<[komisi_quantity]>].replace[%object%].with[<[komisi_object]>].replace[_].with[<&sp>].font[dialog:text/row<[loop_index]>]>
+            - define result:->:<[value].proc[dialog_textreplacedwith].context[<[entity]>].font[dialog:text/row<[loop_index]>]>
             - if <[loop_index]> == <[dialog_text].size>:
-                - define result:->:<[value].replace[%target%].with[<[komisi_quantity]>].replace[%object%].with[<[komisi_object]>].replace[_].with[<&sp>].proc[Dialog_TextOffset]>
+                - define result:->:<[value].proc[dialog_textreplacedwith].context[<[entity]>].proc[Dialog_TextOffset]>
         - determine <[result].unseparated>
     - determine null
+
+Dialog_TextReplacedWith:
+    type: procedure
+    debug: false
+    definitions: text|entity
+    script:
+    - define interact    <[entity].flag[dialog.interact]>
+    - define object      <[interact].proc[Komisi_getTask].context[<[entity].uuid>|target]>
+    - define quantity    <[interact].proc[Komisi_getTask].context[<[entity].uuid>|quantity]>
+    - determine <[text].replace[%target%].with[<[quantity]>].replace[%object%].with[<[object]>].replace[_].with[<&sp>]>
 
 Dialog_ButtonTextUI:
     type: procedure
@@ -223,7 +227,7 @@ Dialog_Data:
                     direct: close
                 2:
                     text: Boleh dipermudah gak? hehe...
-                    direct: tawar
+                    direct: offer
     working:
         armorer:
             text:
