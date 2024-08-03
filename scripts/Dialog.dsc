@@ -19,14 +19,33 @@ Dialog_GUI:
         - inventory clear
         on close:
         - inventory set destination:<player.inventory> origin:<player.flag[dialog.inventories]> if:<player.has_flag[dialog.inventories]>
+        - define entity <player.flag[dialog.entity]>
+        - flag <[entity]> dialog.interact:!
         on click:
         - define slot <context.slot>
+        - define entity     <player.flag[dialog.entity]>
+        - define dialog     <[entity].flag[dialog.<player.uuid>.talk]>
+        - define profession <[entity].profession>
         - if <[slot]> >= 30 && <[slot]> <= 36:
-            - define entity     <player.flag[dialog.entity]>
-            - define schedule   <[entity].proc[MobsBehaviour_VillagerSchedule]>
-            - run Komisi_newTask def.player:<player> def.entity:<[entity]>
+            - define section 1
+            # todo: flag ke entity untuk melanjutkan dialog
+            - if <player.has_flag[komisi.<[entity].uuid>]>:
+                - narrate yay
+            - else if <[dialog]> == work:
+                - run Komisi_newTask def.player:<player> def.entity:<[entity]>
+                # todo: get direct key button from dialog_data
         - if <[slot]> >= 3 && <[slot]> <= 9:
-            - narrate 2
+            - define section 2
+        - stop if:!<[section].is_truthy>
+        - define direct <script[dialog_data].data_key[<[dialog]>.<[profession]>.button.<[section]>.direct]||null>
+        - announce <&9><[direct]>
+        - if <[direct]> == close:
+            - inventory close
+        - else:
+            - flag <[entity]> dialog.<player.uuid>.talk:<[direct]>
+            - inventory close
+            - wait 3t
+            - run Dialog_Talk def.entity:<[entity]>
 
 
 Dialog_UI:
@@ -53,7 +72,9 @@ Dialog_ButtonUI:
     - define result:->:<&chr[E1BC].font[dialog:gui]>
     - define result:->:<element[-170].proc[api_textoffset]>
     - define result:->:<&chr[E2BC].font[dialog:gui]>
-    - define dialog     <[entity].proc[MobsBehaviour_VillagerSchedule]>
+    # todo: masalah dialog disini saat menggantinya gimana?
+    - define interact       <[entity].flag[dialog.interact]>
+    - define dialog         <[entity].flag[dialog.<[interact].uuid>.talk]>
     - define profession <[entity].profession>
     - define button_ui  <script[dialog_data].data_key[<[dialog]>.<[profession]>.button]||null>
     - determine <[result].unseparated> if:!<[button_ui].is_truthy>
@@ -69,7 +90,9 @@ Dialog_TextUI:
     script:
     - define result:->:<element[-165].proc[api_textoffset]><&r>
     - if <[entity].entity_type> == villager:
-        - define dialog         <[entity].proc[MobsBehaviour_VillagerSchedule]>
+    # todo: masalah dialog disini saat menggantinya gimana?
+        - define interact       <[entity].flag[dialog.interact]>
+        - define dialog         <[entity].flag[dialog.<[interact].uuid>.talk]>
         - define profession     <[entity].profession>
         - define dialog_text    <script[dialog_data].data_key[<[dialog]>.<[profession]>.text]||null>
         - define dialog_text    <script[dialog_data].data_key[text]> if:!<[dialog_text].is_truthy>
@@ -91,7 +114,9 @@ Dialog_ButtonTextUI:
     definitions: entity
     script:
     - define result:->:<element[5].proc[api_textoffset]>
-    - define dialog     <[entity].proc[MobsBehaviour_VillagerSchedule]>
+    # todo: masalah dialog disini saat menggantinya gimana?
+    - define interact       <[entity].flag[dialog.interact]>
+    - define dialog         <[entity].flag[dialog.<[interact].uuid>.talk]>
     - define profession <[entity].profession>
     - define button_text <script[dialog_data].data_key[<[dialog]>.<[profession]>.button]||null>
     - determine <[result].unseparated> if:!<[button_text].is_truthy>
@@ -123,6 +148,7 @@ Dialog_Listener:
         on player right clicks villager:
         - determine passively cancelled
         - ratelimit <player> 1s
+        - stop if:<context.entity.has_flag[dialog.interact]>
         - run Dialog_Talk def.entity:<context.entity>
 
 
@@ -136,7 +162,8 @@ Dialog_Talk:
     - define profession <[entity].profession>
     - define inventory  <inventory[Dialog_GUI]>
     - flag <[player]> dialog.entity:<[entity]>
-    - flag <[player]> dialog.talk:<[dialog]>.<[profession]>
+    - flag <[entity]> dialog.<[player].uuid>.talk:<[dialog]> if:!<[entity].has_flag[dialog.<[player].uuid>.talk]>
+    - flag <[entity]> dialog.interact:<[player]>
     - adjust <[inventory]> title:<proc[Dialog_UI]><[entity].proc[dialog_buttonui]><[entity].proc[dialog_textui]><[entity].proc[dialog_buttontextui]>
     - inventory open d:<[inventory]>
 
@@ -194,9 +221,9 @@ Dialog_Data:
             button:
                 1:
                     text: Baiklah, akan aku kerjakan
-                    direct: accept
+                    direct: close
                 2:
-                    text: Tidak ada kah tugas yang lebih baik
+                    text: Boleh dipermudah gak? hehe...
                     direct: tawar
     working:
         armorer:
