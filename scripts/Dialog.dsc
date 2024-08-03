@@ -26,15 +26,23 @@ Dialog_GUI:
         - define entity     <player.flag[dialog.entity]>
         - define dialog     <[entity].flag[dialog.<player.uuid>.talk]>
         - define profession <[entity].profession>
+        # todo: rapikan if else untuk button karena aku rasa ini bisa pake direct doang, gak perlu yang lain
         - if <[slot]> >= 30 && <[slot]> <= 36:
             - define section 1
+            - if <[dialog]> == work:
+                - run Komisi_newTask def.player:<player> def.entity:<[entity]>
         - if <[slot]> >= 3 && <[slot]> <= 9:
             - define section 2
         - stop if:!<[section].is_truthy>
         - define direct <script[dialog_data].data_key[<[dialog]>.<[profession]>.button.<[section]>.direct]||null>
-        - announce <&9><[direct]>
         - if <[direct]> == close:
             - inventory close
+        - else if <[direct]> == offer:
+            - flag <player> komisi.<[entity].uuid>:!
+            - run Komisi_newTask def.player:<player> def.entity:<[entity]>
+            - inventory close
+            - wait 3t
+            - run Dialog_Talk def.entity:<[entity]>
         - else:
             - flag <[entity]> dialog.<player.uuid>.talk:<[direct]>
             - inventory close
@@ -147,6 +155,7 @@ Dialog_TextOffset:
 
 Dialog_Listener:
     type: world
+    debug: false
     events:
         on player right clicks villager:
         - determine passively cancelled
