@@ -1,5 +1,6 @@
 MobsBehaviour_VillagerSchedule:
     type: procedure
+    debug: false
     definitions: entity
     script:
     - determine null if:!<[entity].exists>

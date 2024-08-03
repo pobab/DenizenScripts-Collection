@@ -64,6 +64,7 @@ Komisi_Listener:
 
 Komisi_newTask:
     type: task
+    debug: false
     definitions: player|entity|quantity|profession
     script:
     - define uuid       <util.random_uuid>
@@ -92,6 +93,7 @@ Komisi_newTask:
 
 Komisi_uuidTask:
     type: procedure
+    debug: false
     definitions: player|profession
     script:
     - determine <list> if:!<[player].has_flag[komisi]>
@@ -106,6 +108,7 @@ Komisi_uuidTask:
 
 Komisi_getTask:
     type: procedure
+    debug: false
     definitions: player|uuid|data
     script:
     - determine null if:!<[data].exists>
@@ -120,6 +123,7 @@ Komisi_getTask:
 
 Komisi_setTask:
     type: task
+    debug: false
     definitions: player|uuid|object|value
     subscript:
         validate_value:
