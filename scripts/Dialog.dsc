@@ -72,7 +72,6 @@ Dialog_ButtonUI:
     - define result:->:<&chr[E1BC].font[dialog:gui]>
     - define result:->:<element[-170].proc[api_textoffset]>
     - define result:->:<&chr[E2BC].font[dialog:gui]>
-    # todo: masalah dialog disini saat menggantinya gimana?
     - define interact       <[entity].flag[dialog.interact]>
     - define dialog         <[entity].flag[dialog.<[interact].uuid>.talk]>
     - define profession <[entity].profession>
@@ -90,21 +89,22 @@ Dialog_TextUI:
     script:
     - define result:->:<element[-165].proc[api_textoffset]><&r>
     - if <[entity].entity_type> == villager:
-    # todo: masalah dialog disini saat menggantinya gimana?
         - define interact       <[entity].flag[dialog.interact]>
         - define dialog         <[entity].flag[dialog.<[interact].uuid>.talk]>
         - define profession     <[entity].profession>
         - define dialog_text    <script[dialog_data].data_key[<[dialog]>.<[profession]>.text]||null>
         - define dialog_text    <script[dialog_data].data_key[text]> if:!<[dialog_text].is_truthy>
+        - define komisi_object      <[interact].proc[Komisi_getTask].context[<[entity].uuid>|target]>
+        - define komisi_quantity    <[interact].proc[Komisi_getTask].context[<[entity].uuid>|quantity]>
         # todo: make procedure script to aligned text
         - foreach <[dialog_text]>:
             - if <[loop_index]> > 1:
                 # get previous text for aligned second text to first text
-                - define text <[dialog_text].get[<[loop_index].sub[1]>]>
+                - define text <[dialog_text].get[<[loop_index].sub[1]>].replace[%target%].with[<[komisi_quantity]>].replace[%object%].with[<[komisi_object]>].replace[_].with[<&sp>]>
                 - define result:->:<[text].proc[Dialog_TextOffset]>
-            - define result:->:<[value].font[dialog:text/row<[loop_index]>]>
+            - define result:->:<[value].replace[%target%].with[<[komisi_quantity]>].replace[%object%].with[<[komisi_object]>].replace[_].with[<&sp>].font[dialog:text/row<[loop_index]>]>
             - if <[loop_index]> == <[dialog_text].size>:
-                - define result:->:<[value].proc[Dialog_TextOffset]>
+                - define result:->:<[value].replace[%target%].with[<[komisi_quantity]>].replace[%object%].with[<[komisi_object]>].replace[_].with[<&sp>].proc[Dialog_TextOffset]>
         - determine <[result].unseparated>
     - determine null
 
@@ -114,7 +114,6 @@ Dialog_ButtonTextUI:
     definitions: entity
     script:
     - define result:->:<element[5].proc[api_textoffset]>
-    # todo: masalah dialog disini saat menggantinya gimana?
     - define interact       <[entity].flag[dialog.interact]>
     - define dialog         <[entity].flag[dialog.<[interact].uuid>.talk]>
     - define profession <[entity].profession>

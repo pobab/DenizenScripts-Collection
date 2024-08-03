@@ -71,6 +71,7 @@ Komisi_newTask:
     - define quantity   <util.random.int[1].to[16]> if:!<[quantity].exists>
     - define profession <list[armorer|butcher|cleric|farmer|fisherman].random> if:!<[profession].exists>
     - if <[entity].exists>:
+        - define uuid       <[entity].uuid>
         - define profession <[entity].profession> if:<[entity].profession.exists>
         - flag <[player]> komisi.<[uuid]>.entity:<[entity].entity_type>
 
@@ -107,6 +108,7 @@ Komisi_getTask:
     type: procedure
     definitions: player|uuid|data
     script:
+    - determine null if:!<[data].exists>
     - determine null if:!<[player].has_flag[komisi]>
     - determine <[player].flag[komisi.<[uuid]>].keys.exclude[entity].first>         if:<[data].equals[profession]>
     - define profession <[player].proc[<script.name>].context[<[uuid]>|profession]>
