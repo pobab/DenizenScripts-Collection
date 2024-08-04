@@ -13,6 +13,11 @@ Dialog_GUI:
         - define result:->:<item[air]>
 
     - determine <[result]>
+    subscript:
+        reopen-dialog:
+        - inventory close
+        - wait 3t
+        - run Dialog_Talk def.entity:<[entity]>
     listener:
         on open:
         - flag <player> dialog.inventories:<player.inventory.list_contents>
@@ -23,6 +28,9 @@ Dialog_GUI:
         - flag <[entity]> dialog.interact:!
         on click:
         - define slot <context.slot>
+        - if <[slot]> >= 28 && <[slot]> <= 29 || <[slot]> >= 1 && <[slot]> <= 2:
+            - opentrades <[entity]>
+
         - define entity     <player.flag[dialog.entity]>
         - define dialog     <[entity].flag[dialog.<player.uuid>.talk]>
         - define profession <[entity].profession>
@@ -33,21 +41,18 @@ Dialog_GUI:
                 - run Komisi_newTask def.player:<player> def.entity:<[entity]>
         - if <[slot]> >= 3 && <[slot]> <= 9:
             - define section 2
+
         - stop if:!<[section].is_truthy>
-        - define direct <script[dialog_data].data_key[<[dialog]>.<[profession]>.button.<[section]>.direct]||null>
+        - define direct <script[dialog_data].data_key[<[dialog]>.<[profession]>.button.<[section]>.direct]||null> if:!<[direct].exists>
         - if <[direct]> == close:
             - inventory close
         - else if <[direct]> == offer:
             - flag <player> komisi.<[entity].uuid>:!
             - run Komisi_newTask def.player:<player> def.entity:<[entity]>
-            - inventory close
-            - wait 3t
-            - run Dialog_Talk def.entity:<[entity]>
+            - inject <script> path:subscript.reopen-dialog
         - else:
             - flag <[entity]> dialog.<player.uuid>.talk:<[direct]>
-            - inventory close
-            - wait 3t
-            - run Dialog_Talk def.entity:<[entity]>
+            - inject <script> path:subscript.reopen-dialog
 
 
 Dialog_UI:
@@ -169,13 +174,18 @@ Dialog_Talk:
     debug: false
     definitions: player|entity
     script:
-    - define player <player> if:!<[player].exists>
+    - define player     <player> if:!<[player].exists>
+    - flag <[player]> dialog.entity:<[entity]>
+    - flag <[entity]> dialog.interact:<[player]>
+
     - define dialog     <[entity].proc[MobsBehaviour_VillagerSchedule]>
     - define profession <[entity].profession>
     - define inventory  <inventory[Dialog_GUI]>
-    - flag <[player]> dialog.entity:<[entity]>
-    - flag <[entity]> dialog.<[player].uuid>.talk:<[dialog]> if:!<[entity].has_flag[dialog.<[player].uuid>.talk]>
-    - flag <[entity]> dialog.interact:<[player]>
+    - define in_working <[player].proc[Komisi_getTask].context[<[entity].uuid>|recent]>
+    - if !<[entity].has_flag[dialog.<[player].uuid>.talk]>:
+        - flag <[entity]> dialog.<[player].uuid>.talk:<[dialog]>
+    - if <[in_working].is_truthy>:
+        - flag <[entity]> dialog.<[player].uuid>.talk:working
     - adjust <[inventory]> title:<proc[Dialog_UI]><[entity].proc[dialog_buttonui]><[entity].proc[dialog_textui]><[entity].proc[dialog_buttontextui]>
     - inventory open d:<[inventory]>
 
@@ -240,11 +250,12 @@ Dialog_Data:
     working:
         armorer:
             text:
-            - Sudahkah kamu menambang %target% %object%
+            - Sudahkah kamu menambang
+            - %target% %object%
             button:
                 1:
                     text: Sudah
-                    direct: komisi
+                    direct: completing
                 2:
                     text: Bisakah jumlahnya dikurangkan?
-                    direct: close
+                    direct: offer
