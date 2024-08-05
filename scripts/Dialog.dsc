@@ -27,11 +27,11 @@ Dialog_GUI:
         - define entity <player.flag[dialog.entity]>
         - flag <[entity]> dialog.interact:!
         on click:
-        - define slot <context.slot>
+        - define slot   <context.slot>
+        - define entity <player.flag[dialog.entity]>
         - if <[slot]> >= 28 && <[slot]> <= 29 || <[slot]> >= 1 && <[slot]> <= 2:
             - opentrades <[entity]>
 
-        - define entity     <player.flag[dialog.entity]>
         - define dialog     <[entity].flag[dialog.<player.uuid>.talk]>
         - define profession <[entity].profession>
         # todo: rapikan if else untuk button karena aku rasa ini bisa pake direct doang, gak perlu yang lain
