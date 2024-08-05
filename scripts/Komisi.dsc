@@ -113,12 +113,12 @@ Komisi_getTask:
     script:
     - determine null if:!<[data].exists>
     - determine null if:!<[player].has_flag[komisi]>
-    - determine <[player].flag[komisi.<[uuid]>].keys.exclude[entity].first>         if:<[data].equals[profession]>
+    - determine <[player].flag[komisi.<[uuid]>].keys.exclude[entity].first||null>         if:<[data].equals[profession]>
     - define profession <[player].proc[<script.name>].context[<[uuid]>|profession]>
-    - determine <[player].flag[komisi.<[uuid]>.<[profession]>].keys.first>          if:<[data].equals[target]>
+    - determine <[player].flag[komisi.<[uuid]>.<[profession]>].keys.first||null>          if:<[data].equals[target]>
     - define target     <[player].proc[<script.name>].context[<[uuid]>|target]>
-    - determine <[player].flag[komisi.<[uuid]>.<[profession]>.<[target]>.recent]>   if:<[data].equals[recent]>
-    - determine <[player].flag[komisi.<[uuid]>.<[profession]>.<[target]>.quantity]> if:<[data].equals[quantity]>
+    - determine <[player].flag[komisi.<[uuid]>.<[profession]>.<[target]>.recent]||null>   if:<[data].equals[recent]>
+    - determine <[player].flag[komisi.<[uuid]>.<[profession]>.<[target]>.quantity]||null> if:<[data].equals[quantity]>
 
 
 Komisi_setTask:
